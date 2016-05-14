@@ -4,7 +4,7 @@
 
 Please mind that this package **breaks framework default behaviour for validators**.
 
-Due to `MessageFormatter` structure and methods `Validator::replacer` method should return **array of parameters as *key-value* pair**, instead replacing placeholders in message.
+Due to `MessageFormatter::formatMessage` method, `Validator::replacer` method should return **array of parameters as *key-value* pair**, instead replacing placeholders in message.
 
 Besides that `app('translator')->get($key)` always returns message in raw format (unparsed). Translated messages are returned by:
 
@@ -48,34 +48,43 @@ Skysplit\Laravel\Translation\ValidationServiceProvider::class,
 
 
 ## Publishing config and language files
+
 > Be careful! This will override your existing `resources/lang/{lang}` files!
+
+
 ```bash
 php artisan vendor:publish --provider="Skysplit\Laravel\Translation\ServiceProvider" --force
 ```
 
 If you would like to publish only config
+
 ```bash
 php artisan vendor:publish --provider="Skysplit\Laravel\Translation\ServiceProvider" --tag=config
 ```
 
 If you would like to publish only one language files set
+
 ```bash
 php artisan vendor:publish --provider="Skysplit\Laravel\Translation\ServiceProvider" --force --tag="lang.{locale}[,lang.{other_locale}]"
 ```
+
 ---
 ### Currently available locales
-|Locale|Published files|
-|-|-|
-|**en**|`auth.php`, `validation.php`|
+
+| Locale | Published files |
+| --- | --- |
+| **en** | `auth.php`, `validation.php` |
 
 # Usage examples
 
 Both `trans()` and `transChoice()` helper functions use this translator, so the only thing you have to change is your language files.
 
-For detailed documentation please visit php's [MessageFormatter](http://php.net/manual/en/class.messageformatter.php) docs
+For detailed documentation please visit php's [MessageFormatter](http://php.net/manual/en/class.messageformatter.php) docs and links related there
 
 ## Placeholders
+
 `app/resources/lang/en/custom.php`
+
 ```php
 return [
 	'placeholder' => 'Hello there, {username}!'
@@ -83,6 +92,7 @@ return [
 ```
 
 `view.blade.php`
+
 ```php
 {{ trans('custom.placeholder', ['username' => 'Jane']); }}
 ```
@@ -94,7 +104,9 @@ Hello there, Jane!
 ```
 
 ## Select
+
 `app/resources/lang/en/custom.php`
+
 ```php
 return [
 	'select' => '{gender, select, male{He} female{She} other{It}} has two legs and is {gender}!'
@@ -102,6 +114,7 @@ return [
 ```
 
 `view.blade.php`
+
 ```php
 {{ trans('custom.select', ['gender' => 'male']); }}
 {{ trans('custom.select', ['gender' => 'female']); }}
@@ -117,7 +130,9 @@ It has two legs and is penguin!
 ```
 
 ## Plurals
+
 `app/resources/lang/en/custom.php`
+
 ```php
 return [
 	'plural' => 'Jon has {n, plural, =0{no apples} one{# apple} other{# apples}}'
@@ -125,6 +140,7 @@ return [
 ```
 
 `view.blade.php`
+
 ```php
 {{ transChoice('custom.plural', 0); }}
 {{ transChoice('custom.plural', 1); }}
@@ -132,6 +148,7 @@ return [
 ```
 
 Returns
+
 ```
 Jon has no apples
 Jon has 1 apples
@@ -141,6 +158,7 @@ Jon has 2 apples
 Instead of `transChoice()` you can you use `trans()` helper as well.
 
 `resources/lang/en/custom.php`
+
 ```
 return [
 	'custom.plural' => 'Jon has {0, plural, =0{no apples} one{# apple} other{# apples}}, {grapes, plural, =0{no grapes} one{# grape} other{# grapes} and {oranges, plural, =0{no oranges} one{# orange} other{# oranges}}'
@@ -148,15 +166,27 @@ return [
 ```
 
 `view.blade.php`
+
 ```php
 {{ trans('custom.plural', [3, 'grapes' => 1, 'oranges' => 0]) }}
 ```
 
+Returns
+
+```
+Jon has 3 apples, 1 grape and no oranges
+```
+
+---
+
 As you can see, the only thing `transChoice()` do is passing first argument as `n` parameter to `trans()` helper.
 
 
-## Plural offset
+For more details about pluralization please visit [CLDR Plural Rules](http://cldr.unicode.org/index/cldr-spec/plural-rules) specificaton and [CLDR Language plural rules](http://www.unicode.org/cldr/charts/latest/supplemental/language_plural_rules.html).
+
+### Plural offset
 TBD
+
 
 ## Ordinal
 TBD
@@ -164,13 +194,11 @@ TBD
 ## Spellout
 TBD
 
-For more details about pluralization please visit [CLDR Plural Rules](http://cldr.unicode.org/index/cldr-spec/plural-rules) specificaton and [CLDR Language plural rules](http://www.unicode.org/cldr/charts/latest/supplemental/language_plural_rules.html).
-
-## Escaping characters
-TBD
-
 ## Number formatting
 TBD
 
 ## Date and time formatting
+TBD
+
+## Escaping characters
 TBD
