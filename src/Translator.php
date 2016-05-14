@@ -176,7 +176,7 @@ class Translator extends NamespacedItemResolver implements TranslatorInterface
     {
         $parameters = array_merge($parameters, ['n' => $number]);
 
-        return $this->get($id, $parameters, $locale);
+        return $this->trans($id, $parameters, $domain, $locale);
     }
 
     /**
