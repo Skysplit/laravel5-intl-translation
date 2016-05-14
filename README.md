@@ -37,11 +37,13 @@ In your `config/app.php` providers
 Remove line
 ```php
 Illuminate\Translation\TranslationServiceProvider::class,
+Illuminate\Validation\ValidationServiceProvider::class,
 ```
 
 And add line:
 ```php
-Skysplit\Laravel\Translation\ServiceProvider::class,
+Skysplit\Laravel\Translation\TranslationServiceProvider::class,
+Skysplit\Laravel\Translation\ValidationServiceProvider::class,
 ```
 
 
