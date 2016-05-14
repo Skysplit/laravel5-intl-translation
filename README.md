@@ -50,26 +50,27 @@ Skysplit\Laravel\Translation\ValidationServiceProvider::class,
 ## Publishing config and language files
 
 > Be careful! This will override your existing `resources/lang/{lang}` files!
+> Check **Currently adapted locales** table to see which files could be overriden.
 
 
 ```bash
-php artisan vendor:publish --provider="Skysplit\Laravel\Translation\ServiceProvider" --force
+php artisan vendor:publish --provider="Skysplit\Laravel\Translation\TranslationServiceProvider" --force
 ```
 
 If you would like to publish only config
 
 ```bash
-php artisan vendor:publish --provider="Skysplit\Laravel\Translation\ServiceProvider" --tag=config
+php artisan vendor:publish --provider="Skysplit\Laravel\Translation\TranslationServiceProvider" --tag=config
 ```
 
 If you would like to publish only one language files set
 
 ```bash
-php artisan vendor:publish --provider="Skysplit\Laravel\Translation\ServiceProvider" --force --tag="lang.{locale}[,lang.{other_locale}]"
+php artisan vendor:publish --provider="Skysplit\Laravel\Translation\TranslationServiceProvider" --force --tag="lang.{locale}[,lang.{other_locale}]"
 ```
 
 ---
-### Currently available locales
+### Currently adapted locales 
 
 | Locale | Published files |
 | --- | --- |
@@ -77,7 +78,7 @@ php artisan vendor:publish --provider="Skysplit\Laravel\Translation\ServiceProvi
 
 # Usage examples
 
-Both `trans()` and `transChoice()` helper functions use this translator, so the only thing you have to change is your language files.
+Both `trans()` and `trans_choice()` helper functions use this translator, so the only thing you have to change is your language files.
 
 For detailed documentation please visit php's [MessageFormatter](http://php.net/manual/en/class.messageformatter.php) docs and links related there
 
@@ -142,9 +143,9 @@ return [
 `view.blade.php`
 
 ```php
-{{ transChoice('custom.plural', 0); }}
-{{ transChoice('custom.plural', 1); }}
-{{ transChoice('custom.plural', 2); }}
+{{ trans_choice('custom.plural', 0); }}
+{{ trans_choice('custom.plural', 1); }}
+{{ trans_choice('custom.plural', 2); }}
 ```
 
 Returns
@@ -155,7 +156,7 @@ Jon has 1 apples
 Jon has 2 apples
 ```
 
-Instead of `transChoice()` you can you use `trans()` helper as well.
+Instead of `trans_choice()` you can you use `trans()` helper as well.
 
 `resources/lang/en/custom.php`
 
@@ -179,14 +180,39 @@ Jon has 3 apples, 1 grape and no oranges
 
 ---
 
-As you can see, the only thing `transChoice()` do is passing first argument as `n` parameter to `trans()` helper.
+As you can see, the only thing `trans_choice()` do is passing first argument as `n` parameter to `trans()` helper.
 
 
-For more details about pluralization please visit [CLDR Plural Rules](http://cldr.unicode.org/index/cldr-spec/plural-rules) specificaton and [CLDR Language plural rules](http://www.unicode.org/cldr/charts/latest/supplemental/language_plural_rules.html).
 
 ### Plural offset
-TBD
 
+You can set offset for your plural rules. Consider this example:
+
+```
+You {n, plural, offset:1 =0{do not like this yet} =1{liked this} one{and one other person liked this} other{and # others liked this}}
+```
+
+Result:
+
+```
+You do not like this yet // n = 0
+You liked this // n = 1
+You and one other person liked this // n = 2
+You and 2 others liked this // n = 3
+You and 3 others liked this // n = 4
+
+```
+
+
+---
+
+Plural rule are often very complex for languages. Intl does handle it for you.  
+For example in Polish `few` rule is applied when **n % 10 = 2..4 and n % 100 != 12..14**, while `many` rule is applied  when `n != 1 and n % 10 = 0..1 or n % 10 = 5..9 or n % 100 = 12..14`.  
+In Serbian `=1` will match when **n = 1**, but `one` will apply when **n = 1, 21, 31, 41** etc.
+
+> Remember! You **always** have to provide `other` rule for plural translations.
+
+For more details about pluralization please visit [CLDR Plural Rules](http://cldr.unicode.org/index/cldr-spec/plural-rules) specificaton and [CLDR Language plural rules](http://www.unicode.org/cldr/charts/latest/supplemental/language_plural_rules.html).
 
 ## Ordinal
 TBD
