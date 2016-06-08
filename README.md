@@ -1,4 +1,9 @@
-#Laravel5 Intl Translator
+# Laravel5 Intl Translator
+
+[![Build Status](https://travis-ci.org/Skysplit/laravel5-intl-translation.svg?branch=master)](https://travis-ci.org/Skysplit/laravel5-intl-translation)
+[![Latest Stable Version](https://poser.pugx.org/skysplit/laravel5-intl-translation/v/stable)](https://packagist.org/packages/skysplit/laravel5-intl-translation)
+[![Latest Unstable Version](https://poser.pugx.org/skysplit/laravel5-intl-translation/v/unstable)](https://packagist.org/packages/skysplit/laravel5-intl-translation)
+
 
 **Laravel5 Intl Translator** uses php-intl extension to provide translation for your application.
 
