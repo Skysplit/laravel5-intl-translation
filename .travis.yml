@@ -9,13 +9,10 @@ php:
 cache:
     directories:
         - vendor
-
-install:
+        
+before_script:
     - composer self-update && composer --version
     - composer install --dev
-
-before_script:
-    - phpenv config-rm xdebug.ini
 
 script: 
     - phpunit
