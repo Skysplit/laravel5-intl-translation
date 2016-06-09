@@ -97,7 +97,7 @@ class TranslationServiceProvider extends \Illuminate\Support\ServiceProvider
 
         foreach ($locales as $locale => $files) {
             $localePath = $langPath . $locale . DIRECTORY_SEPARATOR;
-            $resourcePath = resource_path('lang' . DIRECTORY_SEPARATOR . $locale) . DIRECTORY_SEPARATOR;
+            $resourcePath = $this->getResourcesPath() . 'lang' . DIRECTORY_SEPARATOR . $locale . DIRECTORY_SEPARATOR;
             $publishes = [];
 
             foreach ($files as $file) {
@@ -118,6 +118,16 @@ class TranslationServiceProvider extends \Illuminate\Support\ServiceProvider
     protected function getConfigPath()
     {
         return __DIR__ . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . 'config' . DIRECTORY_SEPARATOR;
+    }
+
+    /**
+     * Get path to resources directory
+     * 
+     * @return string
+     */
+    protected function getResourcesPath()
+    {
+        return $this->app->basePath() . DIRECTORY_SEPARATOR . 'resources' . DIRECTORY_SEPARATOR;
     }
 
     /**
