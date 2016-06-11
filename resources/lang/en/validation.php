@@ -72,7 +72,7 @@ return [
     'size'                 => [
         'numeric' => 'The {attribute} must be {size}.',
         'file'    => 'The {attribute} must be {size, plural, =1{# kilobyte} other{# kilobytes}}.',
-        'string'  => 'The {attribute} must be {size, plural, =1{# characters} other{# characters}}.',
+        'string'  => 'The {attribute} must be {size, plural, =1{# character} other{# characters}}.',
         'array'   => 'The {attribute} must contain {size, plural, =1{# item} other{# items}}.',
     ],
     'string'               => 'The {attribute} must be a string.',
