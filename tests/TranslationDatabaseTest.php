@@ -1,0 +1,65 @@
+<?php
+
+use test\Models\User;
+
+class TranslationDatabaseTest extends TestCase
+{
+
+    public function setUp()
+    {
+        parent::setUp();
+
+        // Perform migration
+        $this->artisan('migrate:refresh', [
+            '--database' => 'testing',
+            '--path' => '../tests/database/migrations',
+        ]);
+    }
+
+    public function getEnvironmentSetUp($app)
+    {
+        parent::getEnvironmentSetUp($app);
+
+        $app['config']->set('database.default', 'testing');
+        $app['config']->set('database.connections.testing', [
+            'driver' => 'sqlite',
+            'database' => ':memory:',
+            'prefix' => ''
+        ]);
+    }
+
+    /**
+     * Create test user
+     * 
+     * @return User
+     */
+    public function makeUser()
+    {
+        return User::create(['name' => 'test']);
+    }
+
+    public function testDatabaseValidators()
+    {
+        $this->makeUser();
+
+        $data = [
+            'exists' => 2,
+            'unique' => 1,
+        ];
+
+        $rules = [
+            'exists' => 'exists:users,id',
+            'unique' => 'unique:users,id',
+        ];
+
+        $validator = Validator::make($data, $rules);
+
+        $this->assertTrue($validator->fails());
+        
+        $errors = $validator->getMessageBag();
+
+        $this->assertEquals('The selected exists is invalid.', $errors->first('exists'));
+        $this->assertEquals('The unique has already been taken.', $errors->first('unique'));
+    }
+
+}
