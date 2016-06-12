@@ -19,8 +19,10 @@ app('translator')->formatMessage($locale, $message, $params)
 ```
 
 # Requirements
-- Laravel 5.*
+- Laravel 5.2
 - php-intl extension installed
+
+Please feel free to contribute to this package for other Laravel versions support!
 
 # Installation
 
@@ -29,7 +31,7 @@ If you do not have **php-intl** extension you can install it by following comman
 $ sudo apt-get install php-intl
 ```
 
-If you have other OS, you can use it's respective package manage
+If you have other OS, you can use it's respective package manager
 
 
 ---
