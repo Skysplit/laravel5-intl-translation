@@ -92,7 +92,8 @@ class TranslationServiceProvider extends \Illuminate\Support\ServiceProvider
         $langPath = $this->getLangPath();
 
         $locales = [
-            'en' => ['validation.php', 'auth.php']
+            'en' => ['validation.php', 'auth.php'],
+            'pl' => ['validation.php', 'auth.php', 'passwords.php', 'pagination.php']
         ];
 
         foreach ($locales as $locale => $files) {
