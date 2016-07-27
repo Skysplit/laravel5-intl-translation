@@ -49,7 +49,7 @@ If you have other OS, you can use it's respective package manager
 ---
 
 ```bash
-composer require skysplit/laravel5-intl-translation
+composer require skysplit/laravel5-intl-translation@~1.0
 ```
 
 In your `config/app.php` providers  
@@ -235,4 +235,4 @@ For more details about pluralization please visit [CLDR Plural Rules](http://cld
 
 # Formatting in details
 PHP's MessageFormatter also supports **ordinal**, **spellout**, **number**, **date**, **time** and **duration** formatting.  
-For detailed information please visit this great (Yii2 Framework i18n Guide)[http://www.yiiframework.com/doc-2.0/guide-tutorial-i18n.html] which covers every **intl** topic wonderfully.
+For detailed information please visit this great [Yii2 Framework i18n Guide](http://www.yiiframework.com/doc-2.0/guide-tutorial-i18n.html) which covers every **intl** topic wonderfully.
