@@ -49,7 +49,7 @@ If you have other OS, you can use it's respective package manager
 ---
 
 ```bash
-composer require skysplit/laravel5-intl-translation@~1.0
+composer require skysplit/laravel5-intl-translation=~1.0
 ```
 
 In your `config/app.php` providers  
