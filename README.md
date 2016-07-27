@@ -4,7 +4,19 @@
 [![Latest Stable Version](https://poser.pugx.org/skysplit/laravel5-intl-translation/v/stable)](https://packagist.org/packages/skysplit/laravel5-intl-translation)
 [![Latest Unstable Version](https://poser.pugx.org/skysplit/laravel5-intl-translation/v/unstable)](https://packagist.org/packages/skysplit/laravel5-intl-translation)
 
+- [Introduction](#introduction)
+- [Requirements](#requirements)
+- [Installation](#installation)
+    - [Publishing config and language files](#publishing-config-and-language-files)
+        - [Currently adapted locales](#currently-adapted-locales)
+- [Usage examples](#usage-examples)
+    - [Placeholders](#placeholders)
+    - [Select](#select)
+    - [Plurals](#plurals)
+        - [Plural offset](#plural-offset)
+- [Formatting in details](#formatting-in-details)
 
+# Introduction
 **Laravel5 Intl Translator** uses php-intl extension to provide translation for your application.
 
 Please mind that this package **breaks framework default behaviour for validators**.
@@ -82,6 +94,7 @@ php artisan vendor:publish --provider="Skysplit\Laravel\Translation\TranslationS
 | Locale | Published files |
 | --- | --- |
 | **en** | `auth.php`, `validation.php` |
+| **pl** | `auth.php`, `pagination.php`, `passwords.php`, `validation.php` |
 
 # Usage examples
 
@@ -210,28 +223,16 @@ You and 3 others liked this // n = 4
 
 ```
 
-
 ---
 
 Plural rule are often very complex for languages. Intl does handle it for you.  
-For example in Polish `few` rule is applied when **n % 10 = 2..4 and n % 100 != 12..14**, while `many` rule is applied  when `n != 1 and n % 10 = 0..1 or n % 10 = 5..9 or n % 100 = 12..14`.  
-In Serbian `=1` will match when **n = 1**, but `one` will apply when **n = 1, 21, 31, 41** etc.
+For example in Polish `few` rule is applied when `n % 10 = 2..4 and n % 100 != 12..14`, while `many` rule is applied  when `n != 1 and n % 10 = 0..1` or `n % 10 = 5..9` or `n % 100 = 12..14`.  
+In Serbian `=1` will match when `n = 1`, but `one` will apply when `n = 1, 21, 31, 41` etc.
 
 > Remember! You **always** have to provide `other` rule for plural translations.
 
 For more details about pluralization please visit [CLDR Plural Rules](http://cldr.unicode.org/index/cldr-spec/plural-rules) specificaton and [CLDR Language plural rules](http://www.unicode.org/cldr/charts/latest/supplemental/language_plural_rules.html).
 
-## Ordinal
-TBD
-
-## Spellout
-TBD
-
-## Number formatting
-TBD
-
-## Date and time formatting
-TBD
-
-## Escaping characters
-TBD
+# Formatting in details
+PHP's MessageFormatter also supports **ordinal**, **spellout**, **number**, **date**, **time** and **duration** formatting.  
+For detailed information please visit this great (Yii2 Framework i18n Guide)[http://www.yiiframework.com/doc-2.0/guide-tutorial-i18n.html] which covers every **intl** topic wonderfully.
