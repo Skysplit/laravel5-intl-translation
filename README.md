@@ -31,7 +31,7 @@ app('translator')->formatMessage($locale, $message, $params)
 ```
 
 # Requirements
-- Laravel 5.2
+- Laravel **5.2** or **5.3**
 - php-intl extension installed
 
 Please feel free to contribute to this package for other Laravel versions support!
@@ -48,9 +48,19 @@ If you have other OS, you can use it's respective package manager
 
 ---
 
+### Laravel 5.3
+
 ```bash
-composer require skysplit/laravel5-intl-translation=~1.0
+composer require skysplit/laravel5-intl-translation=^2.0
 ```
+
+### Laravel 5.2
+```bash
+composer require skysplit/laravel5-intl-translation=^1.0
+```
+
+
+## All versions
 
 In your `config/app.php` providers  
 Remove line
@@ -89,7 +99,7 @@ php artisan vendor:publish --provider="Skysplit\Laravel\Translation\TranslationS
 ```
 
 ---
-### Currently adapted locales 
+### Currently adapted locales
 
 | Locale | Published files |
 | --- | --- |

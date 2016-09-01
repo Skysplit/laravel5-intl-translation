@@ -2,7 +2,7 @@
 
 use Illuminate\Http\UploadedFile;
 use Carbon\Carbon;
-  
+
 class TranslationTest extends TestCase
 {
 
@@ -36,9 +36,15 @@ class TranslationTest extends TestCase
 
     public function testValidatorMessages()
     {
+        $imgDir = $this->fixturesPath . '/images';
+
         // Create
-        File::makeDirectory($this->fixturesPath . '/images');
-        
+        if (File::exists($imgDir)) {
+            File::deleteDirectory($imgDir);
+        }
+
+        File::makeDirectory($imgDir);
+
         $faker = Faker\Factory::create($this->app['config']['locale']);
         $fixturesPath = $this->fixturesPath;
 
@@ -174,7 +180,7 @@ class TranslationTest extends TestCase
 
         $validator = Validator::make($data, $rules);
         $errors = $validator->getMessageBag();
-        
+
         $this->assertFalse($validator->passes());
         $this->assertNotEmpty($errors);
         $this->assertEquals('The accepted must be accepted.', $errors->first('accepted'));
@@ -236,9 +242,9 @@ class TranslationTest extends TestCase
         $this->assertEquals('The size array plural must contain 5 items.', $errors->first('size_array_plural'));
         $this->assertEquals('The string must be a string.', $errors->first('string'));
         $this->assertEquals('The timezone must be a valid zone.', $errors->first('timezone'));
-        
+
         // Delete temporary images directory
-        File::deleteDirectory($this->fixturesPath . '/images', false);
+        File::deleteDirectory($imgDir);
     }
 
 }

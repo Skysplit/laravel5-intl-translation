@@ -9,10 +9,9 @@ class TranslationDatabaseTest extends TestCase
     {
         parent::setUp();
 
-        // Perform migration
-        $this->artisan('migrate:refresh', [
+        $this->loadMigrationsFrom([
             '--database' => 'testing',
-            '--path' => '../tests/database/migrations',
+            '--realpath' => realpath(__DIR__ . '/database/migrations'),
         ]);
     }
 
@@ -30,7 +29,7 @@ class TranslationDatabaseTest extends TestCase
 
     /**
      * Create test user
-     * 
+     *
      * @return User
      */
     public function makeUser()
@@ -55,7 +54,7 @@ class TranslationDatabaseTest extends TestCase
         $validator = Validator::make($data, $rules);
 
         $this->assertTrue($validator->fails());
-        
+
         $errors = $validator->getMessageBag();
 
         $this->assertEquals('The selected exists is invalid.', $errors->first('exists'));
