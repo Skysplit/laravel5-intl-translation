@@ -34,7 +34,7 @@ class Translator extends NamespacedItemResolver implements TranslatorInterface
 
     /**
      * Locale region used by translator
-     * 
+     *
      * @var string
      */
     protected $region;
@@ -135,7 +135,7 @@ class Translator extends NamespacedItemResolver implements TranslatorInterface
 
     /**
      * Formats message using php MessageFormatter::formatMessage method
-     * 
+     *
      * @param string $locale
      * @param stirng $message
      * @param array $parameters
@@ -181,7 +181,7 @@ class Translator extends NamespacedItemResolver implements TranslatorInterface
 
     /**
      * Get the language line loader implementation.
-     * 
+     *
      * @return \Illuminate\Translation\LoaderInterface
      */
     public function getLoader()
@@ -243,7 +243,7 @@ class Translator extends NamespacedItemResolver implements TranslatorInterface
 
     /**
      * Set locale region
-     * 
+     *
      * @param string $region
      */
     public function setRegion($region)
@@ -253,7 +253,7 @@ class Translator extends NamespacedItemResolver implements TranslatorInterface
 
     /**
      * Get locale region
-     * 
+     *
      * @return string|null
      */
     public function getRegion()
@@ -263,7 +263,7 @@ class Translator extends NamespacedItemResolver implements TranslatorInterface
 
     /**
      * Get locale with region separated by hypen
-     * 
+     *
      * @param string|null $locale
      * @param string|null $region
      * @return string

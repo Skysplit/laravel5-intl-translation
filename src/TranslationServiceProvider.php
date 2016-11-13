@@ -2,28 +2,18 @@
 
 namespace Skysplit\Laravel\Translation;
 
-use Illuminate\Translation\FileLoader;
+use Illuminate\Translation\TranslationServiceProvider as LaravelProvider;
 
-class TranslationServiceProvider extends \Illuminate\Support\ServiceProvider
+class TranslationServiceProvider extends LaravelProvider
 {
-
     /**
-     * Indicates if loading of the provider is deferred.
-     *
-     * @var bool
-     */
-    protected $defer = true;
-
-    /**
-     * Register the service provider.
-     *
-     * @return void
+     * {@inheritdoc}
      */
     public function register()
     {
-        $this->registerLoader();
+        $this->mergeConfigFrom($this->getConfigPath().'translator.php', 'translator');
 
-        $this->mergeConfigFrom($this->getConfigPath() . 'translator.php', 'translator');
+        $this->registerLoader();
 
         $this->app->singleton('translator', function ($app) {
             $loader = $app['translation.loader'];
@@ -54,38 +44,21 @@ class TranslationServiceProvider extends \Illuminate\Support\ServiceProvider
     }
 
     /**
-     * Register the translation line loader.
-     *
-     * @return void
-     */
-    public function registerLoader()
-    {
-        $this->app->singleton('translation.loader', function ($app) {
-            return new FileLoader($app['files'], $app['path.lang']);
-        });
-    }
-
-    /**
-     * Get the services provided by the provider.
-     *
-     * @return array
-     */
-    public function provides()
-    {
-        return ['translator', 'translation.loader'];
-    }
-
-    /**
-     * * Publish config files using php artisan vendor:publish
+     * * Publish config files using php artisan vendor:publish.
      */
     protected function publishConfig()
     {
         $configFile = 'translator.php';
-        $this->publishes([$this->getConfigPath() . $configFile => config_path($configFile)], 'config');
+
+        $publishes = [
+            $this->getConfigPath().$configFile => config_path($configFile),
+        ];
+
+        $this->publishes($publishes, 'config');
     }
 
     /**
-     * Publish lang files using php artisan vendor:publish
+     * Publish lang files using php artisan vendor:publish.
      */
     protected function publishLangFiles()
     {
@@ -93,42 +66,41 @@ class TranslationServiceProvider extends \Illuminate\Support\ServiceProvider
 
         $locales = [
             'en' => ['validation.php', 'auth.php'],
-            'pl' => ['validation.php', 'auth.php', 'passwords.php', 'pagination.php']
+            'pl' => ['validation.php', 'auth.php', 'passwords.php', 'pagination.php'],
         ];
 
         foreach ($locales as $locale => $files) {
-            $localePath = $langPath . $locale . DIRECTORY_SEPARATOR;
-            $resourcePath = resource_path('lang' . DIRECTORY_SEPARATOR . $locale) . DIRECTORY_SEPARATOR;
+            $localePath = $langPath.$locale.DIRECTORY_SEPARATOR;
+            $resourcePath = resource_path('lang'.DIRECTORY_SEPARATOR.$locale).DIRECTORY_SEPARATOR;
             $publishes = [];
 
             foreach ($files as $file) {
-                $publishes[$localePath . $file] = $resourcePath . $file;
+                $publishes[$localePath.$file] = $resourcePath.$file;
             }
 
-            $group = 'lang.' . $locale;
+            $group = 'lang.'.$locale;
 
             $this->publishes($publishes, $group);
         }
     }
 
     /**
-     * Get config files directory
-     * 
+     * Get config files directory.
+     *
      * @return string
      */
     protected function getConfigPath()
     {
-        return __DIR__ . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . 'config' . DIRECTORY_SEPARATOR;
+        return __DIR__.DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'config'.DIRECTORY_SEPARATOR;
     }
 
     /**
-     * Get language files directory
-     * 
+     * Get language files directory.
+     *
      * @return string
      */
     protected function getLangPath()
     {
-        return __DIR__ . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . 'resources' . DIRECTORY_SEPARATOR . 'lang' . DIRECTORY_SEPARATOR;
+        return __DIR__.DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'resources'.DIRECTORY_SEPARATOR.'lang'.DIRECTORY_SEPARATOR;
     }
-
 }
