@@ -19,6 +19,20 @@ class TranslationTest extends TestCase
         $this->assertEquals('2 apples', trans_choice('test::test.apples', 2));
     }
 
+    public function testPluralsChoiceArray()
+    {
+        $this->assertEquals('no apples', trans_choice('test::test.apples', []));
+        $this->assertEquals('1 apple', trans_choice('test::test.apples', [1]));
+        $this->assertEquals('2 apples', trans_choice('test::test.apples', [1, 2]));
+    }
+
+    public function testPluralsChoiceCountable()
+    {
+        $this->assertEquals('no apples', trans_choice('test::test.apples', collect()));
+        $this->assertEquals('1 apple', trans_choice('test::test.apples', collect([1])));
+        $this->assertEquals('2 apples', trans_choice('test::test.apples', collect([1, 2])));
+    }
+
     public function testPluralsOffset()
     {
         $this->assertEquals('You do not like this yet', trans_choice('test::test.offset', 0));
