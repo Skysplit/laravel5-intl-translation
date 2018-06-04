@@ -31,7 +31,7 @@ app('translator')->formatMessage($locale, $message, $params)
 ```
 
 # Requirements
-- Laravel **5.2** or **5.3**
+- Laravel **5.2** or **5.3** or **5.6**
 - php-intl extension installed
 
 Please feel free to contribute to this package for other Laravel versions support!
@@ -47,6 +47,11 @@ If you have other OS, you can use it's respective package manager
 
 
 ---
+### Laravel 5.6
+
+```bash
+composer require skysplit/laravel5-intl-translation=^2.0
+```
 
 ### Laravel 5.3
 
