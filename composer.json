@@ -27,9 +27,9 @@
     },
     "require": {
         "ext-intl": "*",
-        "illuminate/support": "^5.3",
-        "illuminate/translation": "^5.3",
-        "illuminate/validation": "^5.3"
+        "illuminate/support": "^5.8",
+        "illuminate/translation": "^5.8",
+        "illuminate/validation": "^5.8"
     },
     "require-dev": {
         "orchestra/testbench": "^3.3",

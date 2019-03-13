@@ -3,13 +3,14 @@
 namespace Skysplit\Laravel\Translation;
 
 use Countable;
+use Illuminate\Contracts\Translation\Loader;
 use MessageFormatter;
 use Illuminate\Support\Arr;
 use Illuminate\Translation\LoaderInterface;
 use Illuminate\Support\NamespacedItemResolver;
-use Symfony\Component\Translation\TranslatorInterface;
+use Illuminate\Contracts\Translation\Translator as TranslatorContract;
 
-class Translator extends NamespacedItemResolver implements TranslatorInterface
+class Translator extends NamespacedItemResolver implements TranslatorContract
 {
 
     /**
@@ -54,7 +55,7 @@ class Translator extends NamespacedItemResolver implements TranslatorInterface
      * @param  string  $locale
      * @return void
      */
-    public function __construct(LoaderInterface $loader, $locale)
+    public function __construct(Loader $loader, $locale)
     {
         $this->loader = $loader;
         $this->setLocale($locale);
@@ -116,6 +117,11 @@ class Translator extends NamespacedItemResolver implements TranslatorInterface
         return $message;
     }
 
+    public function getFromJson($key, array $replace = [], $locale = null)
+    {
+        return $this->trans($key, $replace, $locale);
+    }
+
     /**
      * Retrieve a language line out the loaded array.
      *
@@ -152,12 +158,11 @@ class Translator extends NamespacedItemResolver implements TranslatorInterface
      *
      * @param string      $id         The message id (may also be an object that can be cast to string)
      * @param array       $parameters An array of parameters for the message
-     * @param string|null $domain     The domain for the message or null to use the default
      * @param string|null $locale     The locale or null to use the default
      *
      * @return string The translated string
      */
-    public function trans($id, array $parameters = [], $domain = null, $locale = null)
+    public function trans($id, array $parameters = [], $locale = null)
     {
         return $this->formatMessage($locale, $this->get($id, $locale), $parameters);
     }
@@ -168,12 +173,11 @@ class Translator extends NamespacedItemResolver implements TranslatorInterface
      * @param string      $id         The message id (may also be an object that can be cast to string)
      * @param int         $number     The number to use to find the indice of the message
      * @param array       $parameters An array of parameters for the message
-     * @param string|null $domain     The domain for the message or null to use the default
      * @param string|null $locale     The locale or null to use the default
      *
      * @return string The translated string
      */
-    public function transChoice($id, $number, array $parameters = [], $domain = 'messages', $locale = null)
+    public function transChoice($id, $number, array $parameters = [], $locale = null)
     {
         if (is_array($number) || $number instanceof Countable) {
             $number = count($number);
@@ -181,7 +185,7 @@ class Translator extends NamespacedItemResolver implements TranslatorInterface
 
         $parameters = array_merge($parameters, ['n' => $number]);
 
-        return $this->trans($id, $parameters, $domain, $locale);
+        return $this->trans($id, $parameters, $locale);
     }
 
     /**

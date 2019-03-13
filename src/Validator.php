@@ -8,154 +8,135 @@ use Illuminate\Validation\Validator as LaravelValidator;
 
 class Validator extends LaravelValidator
 {
-    /**
-     * {@inheritdoc}
-     */
-    protected function addError($attribute, $rule, $parameters)
+    public function __construct(Translator $translator, array $data, array $rules,
+                                array $messages = [], array $customAttributes = [])
     {
-        $message = $this->getMessage($attribute, $rule);
-        $message = $this->doReplacements($message, $attribute, $rule, $parameters);
+        $this->initialRules = $rules;
+        $this->translator = $translator;
+        $this->customMessages = $messages;
+        $this->data = $this->parseData($data);
+        $this->customAttributes = $customAttributes;
 
-        $this->messages->add($attribute, $message);
+        $this->setRules($rules);
+    }
+
+    protected function replaceAttributePlaceholder($message, $value)
+    {
+        $message = parent::replaceAttributePlaceholder($message, $value);
+
+        return str_replace(
+            ['{attribute}', '{ATTRIBUTE}', '{Attribute}'],
+            [$value, Str::upper($value), Str::ucfirst($value)],
+            $message
+        );
     }
 
     /**
-     * {@inheritdoc}
-     */
-    protected function getMessage($attribute, $rule)
-    {
-        $lowerRule = Str::snake($rule);
-        $inlineMessage = $this->getInlineMessage($attribute, $lowerRule);
-
-        if (! is_null($inlineMessage)) {
-            return $inlineMessage;
-        }
-
-        $customKey = "validation.custom.{$attribute}.{$lowerRule}";
-
-        $customMessage = $this->getCustomMessageFromTranslator($customKey);
-
-        if ($customMessage !== $customKey) {
-            return $customMessage;
-        }
-
-        if (in_array($rule, $this->sizeRules)) {
-            return $this->getSizeMessage($attribute, $rule);
-        }
-
-        $key = "validation.{$lowerRule}";
-
-        if ($this->translator->has($key)) {
-            return $this->translator->get($key);
-        }
-
-        return $this->getInlineMessage($attribute, $lowerRule, $this->fallbackMessages) ?: $key;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    protected function doReplacements($message, $attribute, $rule, $parameters)
-    {
-        if (isset($this->replacers[Str::snake($rule)])) {
-            $parameters = $this->callReplacer($message, $attribute, Str::snake($rule), $parameters);
-        } elseif (method_exists($this, $replacer = "replace{$rule}")) {
-            $parameters = $this->$replacer($message, $attribute, $rule, $parameters);
-        }
-
-        $parameters['attribute'] = $this->getAttribute($attribute);
-
-        return $this->translator->formatMessage(null, $message, $parameters);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    protected function getCustomMessageFromTranslator($customKey)
-    {
-        if ($this->translator->has($customKey)) {
-            return $this->translator->get($customKey);
-        }
-
-        $shortKey = preg_replace('/^validation\.custom\./', '', $customKey);
-
-        $customMessages = Arr::dot($this->translator->get('validation.custom'));
-
-        foreach ($customMessages as $key => $message) {
-            if (Str::contains($key, ['*']) && Str::is($key, $shortKey)) {
-                return $message;
-            }
-        }
-
-        return $customKey;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    protected function getSizeMessage($attribute, $rule)
-    {
-        $lowerRule = Str::snake($rule);
-        $type = $this->getAttributeType($attribute);
-
-        $key = "validation.{$lowerRule}.{$type}";
-
-        return $this->translator->get($key);
-    }
-
-    /**
-     * {@inheritdoc}
+     * Replace all place-holders for the between rule.
+     *
+     * @param  string  $message
+     * @param  string  $attribute
+     * @param  string  $rule
+     * @param  array   $parameters
+     * @return string
      */
     protected function replaceBetween($message, $attribute, $rule, $parameters)
     {
-        return [
-            'min' => $parameters[0],
-            'max' => $parameters[1],
-        ];
+        return str_replace(['{min}', '{max}'], $parameters, $message);
     }
 
     /**
-     * {@inheritdoc}
+     * Replace all place-holders for the date_format rule.
+     *
+     * @param  string  $message
+     * @param  string  $attribute
+     * @param  string  $rule
+     * @param  array   $parameters
+     * @return string
      */
     protected function replaceDateFormat($message, $attribute, $rule, $parameters)
     {
-        return [
-            'format' => $parameters[0],
-        ];
+        return str_replace('{format}', $parameters[0], $message);
     }
 
     /**
-     * {@inheritdoc}
+     * Replace all place-holders for the different rule.
+     *
+     * @param  string  $message
+     * @param  string  $attribute
+     * @param  string  $rule
+     * @param  array   $parameters
+     * @return string
+     */
+    protected function replaceDifferent($message, $attribute, $rule, $parameters)
+    {
+        return $this->replaceSame($message, $attribute, $rule, $parameters);
+    }
+
+    /**
+     * Replace all place-holders for the digits rule.
+     *
+     * @param  string  $message
+     * @param  string  $attribute
+     * @param  string  $rule
+     * @param  array   $parameters
+     * @return string
      */
     protected function replaceDigits($message, $attribute, $rule, $parameters)
     {
-        return [
-            'digits' => $parameters[0],
-        ];
+        return str_replace('{digits}', $parameters[0], $message);
     }
 
     /**
-     * {@inheritdoc}
+     * Replace all place-holders for the digits (between) rule.
+     *
+     * @param  string  $message
+     * @param  string  $attribute
+     * @param  string  $rule
+     * @param  array   $parameters
+     * @return string
+     */
+    protected function replaceDigitsBetween($message, $attribute, $rule, $parameters)
+    {
+        return $this->replaceBetween($message, $attribute, $rule, $parameters);
+    }
+
+    /**
+     * Replace all place-holders for the min rule.
+     *
+     * @param  string  $message
+     * @param  string  $attribute
+     * @param  string  $rule
+     * @param  array   $parameters
+     * @return string
      */
     protected function replaceMin($message, $attribute, $rule, $parameters)
     {
-        return [
-            'min' => $parameters[0],
-        ];
+        return str_replace('{min}', $parameters[0], $message);
     }
 
     /**
-     * {@inheritdoc}
+     * Replace all place-holders for the max rule.
+     *
+     * @param  string  $message
+     * @param  string  $attribute
+     * @param  string  $rule
+     * @param  array   $parameters
+     * @return string
      */
     protected function replaceMax($message, $attribute, $rule, $parameters)
     {
-        return [
-            'max' => $parameters[0],
-        ];
+        return str_replace('{max}', $parameters[0], $message);
     }
 
     /**
-     * {@inheritdoc}
+     * Replace all place-holders for the in rule.
+     *
+     * @param  string  $message
+     * @param  string  $attribute
+     * @param  string  $rule
+     * @param  array   $parameters
+     * @return string
      */
     protected function replaceIn($message, $attribute, $rule, $parameters)
     {
@@ -163,93 +144,372 @@ class Validator extends LaravelValidator
             $parameter = $this->getDisplayableValue($attribute, $parameter);
         }
 
-        return [
-            'values' => implode(', ', $parameters),
-        ];
+        return str_replace('{values}', implode(', ', $parameters), $message);
     }
 
     /**
-     * {@inheritdoc}
+     * Replace all place-holders for the not_in rule.
+     *
+     * @param  string  $message
+     * @param  string  $attribute
+     * @param  string  $rule
+     * @param  array   $parameters
+     * @return string
+     */
+    protected function replaceNotIn($message, $attribute, $rule, $parameters)
+    {
+        return $this->replaceIn($message, $attribute, $rule, $parameters);
+    }
+
+    /**
+     * Replace all place-holders for the in_array rule.
+     *
+     * @param  string  $message
+     * @param  string  $attribute
+     * @param  string  $rule
+     * @param  array   $parameters
+     * @return string
      */
     protected function replaceInArray($message, $attribute, $rule, $parameters)
     {
-        return [
-            'other' => $this->getAttribute($parameters[0]),
-        ];
+        return str_replace('{other}', $this->getDisplayableAttribute($parameters[0]), $message);
     }
 
     /**
-     * {@inheritdoc}
+     * Replace all place-holders for the mimetypes rule.
+     *
+     * @param  string  $message
+     * @param  string  $attribute
+     * @param  string  $rule
+     * @param  array   $parameters
+     * @return string
+     */
+    protected function replaceMimetypes($message, $attribute, $rule, $parameters)
+    {
+        return str_replace('{values}', implode(', ', $parameters), $message);
+    }
+
+    /**
+     * Replace all place-holders for the mimes rule.
+     *
+     * @param  string  $message
+     * @param  string  $attribute
+     * @param  string  $rule
+     * @param  array   $parameters
+     * @return string
      */
     protected function replaceMimes($message, $attribute, $rule, $parameters)
     {
-        return [
-            'values' => implode(',', $parameters),
-        ];
+        return str_replace('{values}', implode(', ', $parameters), $message);
     }
 
     /**
-     * {@inheritdoc}
+     * Replace all place-holders for the required_with rule.
+     *
+     * @param  string  $message
+     * @param  string  $attribute
+     * @param  string  $rule
+     * @param  array   $parameters
+     * @return string
      */
     protected function replaceRequiredWith($message, $attribute, $rule, $parameters)
     {
-        return [
-            'values' => implode(' / ', $this->getAttributeList($parameters)),
-        ];
+        return str_replace('{values}', implode(' / ', $this->getAttributeList($parameters)), $message);
     }
 
     /**
-     * {@inheritdoc}
+     * Replace all place-holders for the required_with_all rule.
+     *
+     * @param  string  $message
+     * @param  string  $attribute
+     * @param  string  $rule
+     * @param  array   $parameters
+     * @return string
+     */
+    protected function replaceRequiredWithAll($message, $attribute, $rule, $parameters)
+    {
+        return $this->replaceRequiredWith($message, $attribute, $rule, $parameters);
+    }
+
+    /**
+     * Replace all place-holders for the required_without rule.
+     *
+     * @param  string  $message
+     * @param  string  $attribute
+     * @param  string  $rule
+     * @param  array   $parameters
+     * @return string
+     */
+    protected function replaceRequiredWithout($message, $attribute, $rule, $parameters)
+    {
+        return $this->replaceRequiredWith($message, $attribute, $rule, $parameters);
+    }
+
+    /**
+     * Replace all place-holders for the required_without_all rule.
+     *
+     * @param  string  $message
+     * @param  string  $attribute
+     * @param  string  $rule
+     * @param  array   $parameters
+     * @return string
+     */
+    protected function replaceRequiredWithoutAll($message, $attribute, $rule, $parameters)
+    {
+        return $this->replaceRequiredWith($message, $attribute, $rule, $parameters);
+    }
+
+    /**
+     * Replace all place-holders for the size rule.
+     *
+     * @param  string  $message
+     * @param  string  $attribute
+     * @param  string  $rule
+     * @param  array   $parameters
+     * @return string
      */
     protected function replaceSize($message, $attribute, $rule, $parameters)
     {
-        return [
-            'size' => $parameters[0],
-        ];
+        return str_replace('{size}', $parameters[0], $message);
     }
 
     /**
-     * {@inheritdoc}
+     * Replace all place-holders for the gt rule.
+     *
+     * @param  string  $message
+     * @param  string  $attribute
+     * @param  string  $rule
+     * @param  array   $parameters
+     * @return string
+     */
+    protected function replaceGt($message, $attribute, $rule, $parameters)
+    {
+        if (is_null($value = $this->getValue($parameters[0]))) {
+            return str_replace('{value}', $parameters[0], $message);
+        }
+
+        return str_replace('{value}', $this->getSize($attribute, $value), $message);
+    }
+
+    /**
+     * Replace all place-holders for the lt rule.
+     *
+     * @param  string  $message
+     * @param  string  $attribute
+     * @param  string  $rule
+     * @param  array   $parameters
+     * @return string
+     */
+    protected function replaceLt($message, $attribute, $rule, $parameters)
+    {
+        if (is_null($value = $this->getValue($parameters[0]))) {
+            return str_replace('{value}', $parameters[0], $message);
+        }
+
+        return str_replace('{value}', $this->getSize($attribute, $value), $message);
+    }
+
+    /**
+     * Replace all place-holders for the gte rule.
+     *
+     * @param  string  $message
+     * @param  string  $attribute
+     * @param  string  $rule
+     * @param  array   $parameters
+     * @return string
+     */
+    protected function replaceGte($message, $attribute, $rule, $parameters)
+    {
+        if (is_null($value = $this->getValue($parameters[0]))) {
+            return str_replace('{value}', $parameters[0], $message);
+        }
+
+        return str_replace('{value}', $this->getSize($attribute, $value), $message);
+    }
+
+    /**
+     * Replace all place-holders for the lte rule.
+     *
+     * @param  string  $message
+     * @param  string  $attribute
+     * @param  string  $rule
+     * @param  array   $parameters
+     * @return string
+     */
+    protected function replaceLte($message, $attribute, $rule, $parameters)
+    {
+        if (is_null($value = $this->getValue($parameters[0]))) {
+            return str_replace('{value}', $parameters[0], $message);
+        }
+
+        return str_replace('{value}', $this->getSize($attribute, $value), $message);
+    }
+
+    /**
+     * Replace all place-holders for the required_if rule.
+     *
+     * @param  string  $message
+     * @param  string  $attribute
+     * @param  string  $rule
+     * @param  array   $parameters
+     * @return string
      */
     protected function replaceRequiredIf($message, $attribute, $rule, $parameters)
     {
         $parameters[1] = $this->getDisplayableValue($parameters[0], Arr::get($this->data, $parameters[0]));
-        $parameters[0] = $this->getAttribute($parameters[0]);
 
-        return [
-            'other' => $parameters[0],
-            'value' => $parameters[1],
-        ];
+        $parameters[0] = $this->getDisplayableAttribute($parameters[0]);
+
+        return str_replace(['{other}', '{value}'], $parameters, $message);
     }
 
     /**
-     * {@inheritdoc}
+     * Replace all place-holders for the required_unless rule.
+     *
+     * @param  string  $message
+     * @param  string  $attribute
+     * @param  string  $rule
+     * @param  array   $parameters
+     * @return string
      */
     protected function replaceRequiredUnless($message, $attribute, $rule, $parameters)
     {
-        return [
-            'other' => $this->getAttribute(array_shift($parameters)),
-            'values' => implode(', ', $parameters),
-        ];
+        $other = $this->getDisplayableAttribute($parameters[0]);
+
+        $values = [];
+
+        foreach (array_slice($parameters, 1) as $value) {
+            $values[] = $this->getDisplayableValue($parameters[0], $value);
+        }
+
+        return str_replace(['{other}', '{values}'], [$other, implode(', ', $values)], $message);
     }
 
     /**
-     * {@inheritdoc}
+     * Replace all place-holders for the same rule.
+     *
+     * @param  string  $message
+     * @param  string  $attribute
+     * @param  string  $rule
+     * @param  array   $parameters
+     * @return string
      */
     protected function replaceSame($message, $attribute, $rule, $parameters)
     {
-        return [
-            'other' => $this->getAttribute($parameters[0]),
-        ];
+        return str_replace('{other}', $this->getDisplayableAttribute($parameters[0]), $message);
     }
 
     /**
-     * {@inheritdoc}
+     * Replace all place-holders for the before rule.
+     *
+     * @param  string  $message
+     * @param  string  $attribute
+     * @param  string  $rule
+     * @param  array   $parameters
+     * @return string
      */
     protected function replaceBefore($message, $attribute, $rule, $parameters)
     {
-        $date = strtotime($parameters[0]) ? $parameters[0] : $this->getAttribute($parameters[0]);
+        if (! strtotime($parameters[0])) {
+            return str_replace('{date}', $this->getDisplayableAttribute($parameters[0]), $message);
+        }
 
-        return compact('date');
+        return str_replace('{date}', $this->getDisplayableValue($attribute, $parameters[0]), $message);
+    }
+
+    /**
+     * Replace all place-holders for the before_or_equal rule.
+     *
+     * @param  string  $message
+     * @param  string  $attribute
+     * @param  string  $rule
+     * @param  array   $parameters
+     * @return string
+     */
+    protected function replaceBeforeOrEqual($message, $attribute, $rule, $parameters)
+    {
+        return $this->replaceBefore($message, $attribute, $rule, $parameters);
+    }
+
+    /**
+     * Replace all place-holders for the after rule.
+     *
+     * @param  string  $message
+     * @param  string  $attribute
+     * @param  string  $rule
+     * @param  array   $parameters
+     * @return string
+     */
+    protected function replaceAfter($message, $attribute, $rule, $parameters)
+    {
+        return $this->replaceBefore($message, $attribute, $rule, $parameters);
+    }
+
+    /**
+     * Replace all place-holders for the after_or_equal rule.
+     *
+     * @param  string  $message
+     * @param  string  $attribute
+     * @param  string  $rule
+     * @param  array   $parameters
+     * @return string
+     */
+    protected function replaceAfterOrEqual($message, $attribute, $rule, $parameters)
+    {
+        return $this->replaceBefore($message, $attribute, $rule, $parameters);
+    }
+
+    /**
+     * Replace all place-holders for the date_equals rule.
+     *
+     * @param  string  $message
+     * @param  string  $attribute
+     * @param  string  $rule
+     * @param  array   $parameters
+     * @return string
+     */
+    protected function replaceDateEquals($message, $attribute, $rule, $parameters)
+    {
+        return $this->replaceBefore($message, $attribute, $rule, $parameters);
+    }
+
+    /**
+     * Replace all place-holders for the dimensions rule.
+     *
+     * @param  string  $message
+     * @param  string  $attribute
+     * @param  string  $rule
+     * @param  array   $parameters
+     * @return string
+     */
+    protected function replaceDimensions($message, $attribute, $rule, $parameters)
+    {
+        $parameters = $this->parseNamedParameters($parameters);
+
+        if (is_array($parameters)) {
+            foreach ($parameters as $key => $value) {
+                $message = str_replace('{}'.$key, $value, $message);
+            }
+        }
+
+        return $message;
+    }
+
+    /**
+     * Replace all place-holders for the starts_with rule.
+     *
+     * @param  string  $message
+     * @param  string  $attribute
+     * @param  string  $rule
+     * @param  array   $parameters
+     * @return string
+     */
+    protected function replaceStartsWith($message, $attribute, $rule, $parameters)
+    {
+        foreach ($parameters as &$parameter) {
+            $parameter = $this->getDisplayableValue($attribute, $parameter);
+        }
+
+        return str_replace('{values}', implode(', ', $parameters), $message);
     }
 }
