@@ -164,6 +164,9 @@ class Translator extends NamespacedItemResolver implements TranslatorContract
      */
     public function trans($id, array $parameters = [], $locale = null)
     {
+        // for older versions of the intl-package we must provide a non-empty array with a dummy value ["___"] to prevent
+        // the placeholder to be replaced by {0}
+        $parameters["__"] = "__";
         return $this->formatMessage($locale, $this->get($id, $locale), $parameters);
     }
 
