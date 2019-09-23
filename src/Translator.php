@@ -83,39 +83,10 @@ class Translator extends NamespacedItemResolver implements TranslatorContract
      */
     public function has($key, $locale = null, $fallback = true)
     {
-        return $this->get($key, $locale, $fallback) !== $key;
+        return $this->getMessage($key, $locale, $fallback) !== $key;
     }
 
-    /**
-     * Get the translation for the given key.
-     *
-     * @param  string  $key
-     * @param  string|null  $locale
-     * @param  bool  $fallback
-     * @return string|array|null
-     */
-    public function get($key, $locale = null, $fallback = true)
-    {
-        list($namespace, $group, $item) = $this->parseKey($key);
 
-        $locales = $fallback ? $this->parseLocale($locale) : [$locale ? : $this->locale];
-
-        foreach ($locales as $locale) {
-            $this->load($namespace, $group, $locale);
-
-            $message = $this->getLine($namespace, $group, $locale, $item);
-
-            if (!is_null($message)) {
-                break;
-            }
-        }
-
-        if (!isset($message)) {
-            return $key;
-        }
-
-        return $message;
-    }
 
     public function getFromJson($key, array $replace = [], $locale = null)
     {
@@ -162,12 +133,12 @@ class Translator extends NamespacedItemResolver implements TranslatorContract
      *
      * @return string The translated string
      */
-    public function trans($id, array $parameters = [], $locale = null)
+    public function get($id, array $parameters = [], $locale = null)
     {
         // for older versions of the intl-package we must provide a non-empty array with a dummy value ["___"] to prevent
         // the placeholder to be replaced by {0}
         $parameters["__"] = "__";
-        return $this->formatMessage($locale, $this->get($id, $locale), $parameters);
+        return $this->formatMessage($locale, $this->getMessage($id, $locale), $parameters);
     }
 
     /**
@@ -189,6 +160,11 @@ class Translator extends NamespacedItemResolver implements TranslatorContract
         $parameters = array_merge($parameters, ['n' => $number]);
 
         return $this->trans($id, $parameters, $locale);
+    }
+
+    public function choice($key, $number, array $replace = [], $locale = null)
+    {
+        return $this->transChoice($key, $number, $replace, $locale);
     }
 
     /**
@@ -367,4 +343,36 @@ class Translator extends NamespacedItemResolver implements TranslatorContract
         $this->loader->addNamespace($namespace, $hint);
     }
 
+
+    /**
+     * Get the translation for the given key.
+     *
+     * @param  string  $key
+     * @param  string|null  $locale
+     * @param  bool  $fallback
+     * @return string|array|null
+     */
+    public function getMessage($key, $locale = null)
+    {
+        list($namespace, $group, $item) = $this->parseKey($key);
+
+
+        $locales = [$locale ? : $this->locale];
+
+        foreach ($locales as $locale) {
+            $this->load($namespace, $group, $locale);
+
+            $message = $this->getLine($namespace, $group, $locale, $item);
+
+            if (!is_null($message)) {
+                break;
+            }
+        }
+
+        if (!isset($message)) {
+            return $key;
+        }
+
+        return $message;
+    }
 }
