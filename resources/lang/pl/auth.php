@@ -1,7 +1,8 @@
 <?php
 
-return [
+declare(strict_types=1);
 
+return [
     /*
     |--------------------------------------------------------------------------
     | Authentication Language Lines
@@ -15,5 +16,4 @@ return [
 
     'failed' => 'Błędny login lub hasło.',
     'throttle' => 'Za dużo nieudanych prób logowania. Proszę spróbować za {seconds, plural, one{# sekundę} few{# sekundy} many{# sekund} other{sekundy}}.',
-
 ];

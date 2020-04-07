@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Skysplit\Laravel\Translation;
 
 use Illuminate\Translation\TranslationServiceProvider as LaravelProvider;
@@ -11,7 +13,7 @@ class TranslationServiceProvider extends LaravelProvider
      */
     public function register()
     {
-        $this->mergeConfigFrom($this->getConfigPath().'translator.php', 'translator');
+        $this->mergeConfigFrom($this->getConfigPath() . 'translator.php', 'translator');
 
         $this->registerLoader();
 
@@ -34,8 +36,6 @@ class TranslationServiceProvider extends LaravelProvider
 
     /**
      * Bootstrap the application events.
-     *
-     * @return void
      */
     public function boot()
     {
@@ -51,7 +51,7 @@ class TranslationServiceProvider extends LaravelProvider
         $configFile = 'translator.php';
 
         $publishes = [
-            $this->getConfigPath().$configFile => config_path($configFile),
+            $this->getConfigPath() . $configFile => config_path($configFile),
         ];
 
         $this->publishes($publishes, 'config');
@@ -70,15 +70,15 @@ class TranslationServiceProvider extends LaravelProvider
         ];
 
         foreach ($locales as $locale => $files) {
-            $localePath = $langPath.$locale.DIRECTORY_SEPARATOR;
-            $resourcePath = resource_path('lang'.DIRECTORY_SEPARATOR.$locale).DIRECTORY_SEPARATOR;
+            $localePath = $langPath . $locale . \DIRECTORY_SEPARATOR;
+            $resourcePath = resource_path('lang' . \DIRECTORY_SEPARATOR . $locale) . \DIRECTORY_SEPARATOR;
             $publishes = [];
 
             foreach ($files as $file) {
-                $publishes[$localePath.$file] = $resourcePath.$file;
+                $publishes[$localePath . $file] = $resourcePath . $file;
             }
 
-            $group = 'lang.'.$locale;
+            $group = 'lang.' . $locale;
 
             $this->publishes($publishes, $group);
         }
@@ -91,7 +91,7 @@ class TranslationServiceProvider extends LaravelProvider
      */
     protected function getConfigPath()
     {
-        return __DIR__.DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'config'.DIRECTORY_SEPARATOR;
+        return __DIR__ . \DIRECTORY_SEPARATOR . '..' . \DIRECTORY_SEPARATOR . 'config' . \DIRECTORY_SEPARATOR;
     }
 
     /**
@@ -101,6 +101,6 @@ class TranslationServiceProvider extends LaravelProvider
      */
     protected function getLangPath()
     {
-        return __DIR__.DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'resources'.DIRECTORY_SEPARATOR.'lang'.DIRECTORY_SEPARATOR;
+        return __DIR__ . \DIRECTORY_SEPARATOR . '..' . \DIRECTORY_SEPARATOR . 'resources' . \DIRECTORY_SEPARATOR . 'lang' . \DIRECTORY_SEPARATOR;
     }
 }

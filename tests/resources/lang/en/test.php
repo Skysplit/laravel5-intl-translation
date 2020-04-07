@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 return [
     'hello' => 'Hello, {name}!',
     'apples' => '{n, plural, =0{no apples} =1{# apple} other{# apples}}',

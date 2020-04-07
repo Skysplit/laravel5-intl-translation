@@ -1,14 +1,19 @@
 <?php
 
-use Illuminate\Http\UploadedFile;
+declare(strict_types=1);
+
 use Carbon\Carbon;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
 
+/**
+ * @internal
+ * @coversNothing
+ */
 class TranslationTest extends TestCase
 {
-
     public function testAttributesPlaceholder()
     {
         $this->assertEquals('Hello, Jane!', trans('test::test.hello', ['name' => 'Jane']));
@@ -59,7 +64,6 @@ class TranslationTest extends TestCase
         if (File::exists($imgDir) === false) {
             File::makeDirectory($imgDir);
         }
-
 
         $fixturesPath = $this->fixturesPath;
 
@@ -128,11 +132,10 @@ class TranslationTest extends TestCase
             'size_file_singular' => new UploadedFile($fixturesPath . '/texts/test_empty.txt', Str::random(), null, null, null, true),
             'size_string_singular' => 'ab',
             'size_array_singular' => ['a', 'b'],
-            'starts_with' => "abcdef",
+            'starts_with' => 'abcdef',
             'string' => 1234,
             'timezone' => 'NotATimezone',
         ];
-
 
         $rules = [
             'accepted' => 'accepted',
@@ -196,7 +199,7 @@ class TranslationTest extends TestCase
             'size_array_singular' => 'array|size:1',
             'string' => 'string',
             'starts_with' => 'starts_with:asdf',
-            'timezone' => 'timezone'
+            'timezone' => 'timezone',
         ];
 
         $validator = Validator::make($data, $rules);
@@ -267,5 +270,4 @@ class TranslationTest extends TestCase
         $this->assertEquals('The starts with must start with one of the following: asdf', $errors->first('starts_with'));
         $this->assertEquals('The timezone must be a valid zone.', $errors->first('timezone'));
     }
-
 }

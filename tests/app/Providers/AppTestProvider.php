@@ -1,8 +1,9 @@
 <?php
 
+declare(strict_types=1);
+
 class AppTestProvider extends Illuminate\Support\ServiceProvider
 {
-
     public function boot()
     {
         // Add custom translations vendor
@@ -13,5 +14,4 @@ class AppTestProvider extends Illuminate\Support\ServiceProvider
     {
         // Absolutely nothing
     }
-
 }
