@@ -1,6 +1,7 @@
 <?php
 
 use Skysplit\Laravel\Translation\TranslationServiceProvider;
+use Skysplit\Laravel\Translation\Translator;
 use Skysplit\Laravel\Translation\ValidationServiceProvider;
 
 class TestCase extends Orchestra\Testbench\TestCase
@@ -11,7 +12,7 @@ class TestCase extends Orchestra\Testbench\TestCase
      */
     protected $fixturesPath = null;
 
-    public function setUp()
+    public function setUp() :void
     {
         parent::setUp();
         

@@ -2,6 +2,9 @@
 
 use Illuminate\Http\UploadedFile;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Str;
 
 class TranslationTest extends TestCase
 {
@@ -53,28 +56,28 @@ class TranslationTest extends TestCase
         $imgDir = $this->fixturesPath . '/images';
 
         // Create
-        if (File::exists($imgDir)) {
-            File::deleteDirectory($imgDir);
+        if (File::exists($imgDir) === false) {
+            File::makeDirectory($imgDir);
         }
 
-        File::makeDirectory($imgDir);
 
-        $faker = Faker\Factory::create($this->app['config']['locale']);
         $fixturesPath = $this->fixturesPath;
 
         $data = [
             'accepted' => false,
             'required_if_cond' => true,
             'active_url' => 'thispage',
-            'after_date' => Carbon::now()->toDateTimeString(),
+            'after_date' => Carbon::now()->subDay()->toDateTimeString(),
+            'after_or_equal_date' => Carbon::now()->subDay()->toDateTimeString(),
             'alpha' => 123,
             'alpha_dash' => '&*',
             'alpha_num' => '_-',
             'array' => '123',
-            'before_date' => Carbon::now()->toDateString(),
+            'before_date' => Carbon::now()->addDay()->toDateString(),
+            'before_or_equal_date' => Carbon::now()->addDay()->toDateString(),
             'between_numeric' => 10,
-            'between_file' => new UploadedFile($fixturesPath . '/texts/test_between.txt', str_random(), null, null, null, true),
-            'between_string' => str_random(10),
+            'between_file' => new UploadedFile($fixturesPath . '/texts/test_between.txt', Str::random(), null, null, null, true),
+            'between_string' => Str::random(10),
             'between_array' => range(1, 10),
             'boolean' => 'string',
             'confirmed_confirmation' => 'b',
@@ -91,22 +94,22 @@ class TranslationTest extends TestCase
             ],
             'email' => 'notanemail',
             'filled' => '',
-            'image' => new UploadedFile($fixturesPath . '/texts/test_between.txt', str_random(), null, null, null, true),
+            'image' => new UploadedFile($fixturesPath . '/texts/test_between.txt', Str::random(), null, null, null, true),
             'in' => 'c',
             'in_array' => 4,
             'integer' => 4.20,
             'ip' => 'a.a.a.a',
             'json' => '{a:c}',
             'max_numeric' => 1234567,
-            'max_file_plural' => new UploadedFile($fixturesPath . '/texts/test_between.txt', str_random(), null, 0, null, true),
+            'max_file_plural' => new UploadedFile($fixturesPath . '/texts/test_between.txt', Str::random(), null, 0, null, true),
             'max_string_plural' => 'abcdefghijklmn',
             'max_array_plural' => [1, 2, 3, 4, 5, 6],
-            'max_file_singular' => new UploadedFile($fixturesPath . '/texts/test_between.txt', str_random(), null, 5, null, true),
+            'max_file_singular' => new UploadedFile($fixturesPath . '/texts/test_between.txt', Str::random(), null, 5, null, true),
             'max_string_singular' => 'string|max:1',
             'max_array_singular' => [1, 2],
-            'mimes' => new UploadedFile($faker->image($this->fixturesPath . '/images'), str_random(), null, null, null, true),
+            'mimes' => new UploadedFile($this->fixturesPath . '/images/image.jpg', Str::random(), null, null, null, true),
             'min_numeric' => 1,
-            'min_file' => new UploadedFile($fixturesPath . '/texts/test_empty.txt', str_random(), null, null, null, true),
+            'min_file' => new UploadedFile($fixturesPath . '/texts/test_empty.txt', Str::random(), null, null, null, true),
             'min_string' => 'a',
             'min_array' => [1],
             'numeric' => 'qwe',
@@ -119,25 +122,29 @@ class TranslationTest extends TestCase
             'required_without_all' => '',
             'same' => 'notthesame',
             'size_numeric' => 12,
-            'size_file_plural' => new UploadedFile($fixturesPath . '/texts/test_empty.txt', str_random(), null, null, null, true),
+            'size_file_plural' => new UploadedFile($fixturesPath . '/texts/test_empty.txt', Str::random(), null, null, null, true),
             'size_string_plural' => 'ab',
             'size_array_plural' => ['a', 'b'],
-            'size_file_singular' => new UploadedFile($fixturesPath . '/texts/test_empty.txt', str_random(), null, null, null, true),
+            'size_file_singular' => new UploadedFile($fixturesPath . '/texts/test_empty.txt', Str::random(), null, null, null, true),
             'size_string_singular' => 'ab',
             'size_array_singular' => ['a', 'b'],
+            'starts_with' => "abcdef",
             'string' => 1234,
             'timezone' => 'NotATimezone',
         ];
+
 
         $rules = [
             'accepted' => 'accepted',
             'active_url' => 'active_url',
             'after_date' => 'after:tomorrow',
+            'after_or_equal_date' => 'after_or_equal:tomorrow',
             'alpha' => 'alpha',
             'alpha_dash' => 'alpha_dash',
             'alpha_num' => 'alpha_num',
             'array' => 'array',
             'before_date' => 'before:yesterday',
+            'before_or_equal_date' => 'before_or_equal:yesterday',
             'between_numeric' => 'numeric|between:1,5',
             'between_file' => 'file|between:1,5',
             'between_string' => 'between:1,5',
@@ -174,7 +181,6 @@ class TranslationTest extends TestCase
             'numeric' => 'numeric',
             'present' => 'present',
             'regex' => 'regex:/^([\w\d]+?)$/',
-            'required' => 'required',
             'required_if' => 'required_if:in,c',
             'required_with' => 'required_with:email,ip',
             'required_with_all' => 'required_with_all:email,ip',
@@ -189,6 +195,7 @@ class TranslationTest extends TestCase
             'size_file_singular' => 'file|size:1',
             'size_array_singular' => 'array|size:1',
             'string' => 'string',
+            'starts_with' => 'starts_with:asdf',
             'timezone' => 'timezone'
         ];
 
@@ -200,11 +207,13 @@ class TranslationTest extends TestCase
         $this->assertEquals('The accepted must be accepted.', $errors->first('accepted'));
         $this->assertEquals('The active url is not a valid URL.', $errors->first('active_url'));
         $this->assertEquals('The after date must be a date after tomorrow.', $errors->first('after_date'));
+        $this->assertEquals('The after or equal date must be a date after or equal to tomorrow.', $errors->first('after_or_equal_date'));
         $this->assertEquals('The alpha may only contain letters.', $errors->first('alpha'));
         $this->assertEquals('The alpha dash may only contain letters, numbers, and dashes.', $errors->first('alpha_dash'));
         $this->assertEquals('The alpha num may only contain letters and numbers.', $errors->first('alpha_num'));
         $this->assertEquals('The array must be an array.', $errors->first('array'));
         $this->assertEquals('The before date must be a date before yesterday.', $errors->first('before_date'));
+        $this->assertEquals('The before or equal date must be a date before or equal to yesterday.', $errors->first('before_or_equal_date'));
         $this->assertEquals('The between numeric must be between 1 and 5.', $errors->first('between_numeric'));
         $this->assertEquals('The between file must be between 1 and 5 kilobytes.', $errors->first('between_file'));
         $this->assertEquals('The between string must be between 1 and 5 characters.', $errors->first('between_string'));
@@ -232,7 +241,7 @@ class TranslationTest extends TestCase
         $this->assertEquals('The max file plural may not be greater than 5 kilobytes.', $errors->first('max_file_plural'));
         $this->assertEquals('The max string plural may not be greater than 5 characters.', $errors->first('max_string_plural'));
         $this->assertEquals('The max array plural may not have more than 5 items.', $errors->first('max_array_plural'));
-        $this->assertEquals('The mimes must be a file of type: txt,avi,html.', $errors->first('mimes'));
+        $this->assertEquals('The mimes must be a file of type: txt, avi, html.', $errors->first('mimes'));
         $this->assertEquals('The min numeric must be at least 5.', $errors->first('min_numeric'));
         $this->assertEquals('The min file must be at least 5 kilobytes.', $errors->first('min_file'));
         $this->assertEquals('The min string must be at least 5 characters.', $errors->first('min_string'));
@@ -255,10 +264,8 @@ class TranslationTest extends TestCase
         $this->assertEquals('The size file plural must be 5 kilobytes.', $errors->first('size_file_plural'));
         $this->assertEquals('The size array plural must contain 5 items.', $errors->first('size_array_plural'));
         $this->assertEquals('The string must be a string.', $errors->first('string'));
+        $this->assertEquals('The starts with must start with one of the following: asdf', $errors->first('starts_with'));
         $this->assertEquals('The timezone must be a valid zone.', $errors->first('timezone'));
-
-        // Delete temporary images directory
-        File::deleteDirectory($imgDir);
     }
 
 }

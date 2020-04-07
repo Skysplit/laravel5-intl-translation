@@ -1,11 +1,12 @@
 <?php
 
+use Illuminate\Support\Facades\Validator;
 use test\Models\User;
 
 class TranslationDatabaseTest extends TestCase
 {
 
-    public function setUp()
+    public function setUp() : void
     {
         parent::setUp();
 
