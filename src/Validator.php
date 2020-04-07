@@ -1,9 +1,11 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Skysplit\Laravel\Translation;
 
-use Illuminate\Support\Str;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Str;
 use Illuminate\Validation\Validator as LaravelValidator;
 
 class Validator extends LaravelValidator
@@ -20,6 +22,39 @@ class Validator extends LaravelValidator
         $this->setRules($rules);
     }
 
+    /**
+     * Replace all error message place-holders with actual values.
+     *
+     * @param string $message
+     * @param string $attribute
+     * @param string $rule
+     * @param array  $parameters
+     *
+     * @return string
+     */
+    public function makeReplacements($message, $attribute, $rule, $parameters)
+    {
+        $message = $this->replaceAttributePlaceholder(
+            $message, $this->getDisplayableAttribute($attribute)
+        );
+
+        $message = $this->replaceInputPlaceholder($message, $attribute);
+
+        if (isset($this->replacers[Str::snake($rule)])) {
+            return $this->callReplacer($message, $attribute, Str::snake($rule), $parameters, $this);
+        }
+        if (method_exists($this, $replacer = "replace{$rule}")) {
+            $value = $this->{$replacer}($message, $attribute, $rule, $parameters);
+            if (\is_array($value)) {
+                return $this->translator->formatMessage(null, $message, array_merge($parameters, $value));
+            }
+
+            return $value;
+        }
+
+        return $message;
+    }
+
     protected function replaceAttributePlaceholder($message, $value)
     {
         $message = parent::replaceAttributePlaceholder($message, $value);
@@ -34,39 +69,47 @@ class Validator extends LaravelValidator
     /**
      * Replace all place-holders for the between rule.
      *
-     * @param  string  $message
-     * @param  string  $attribute
-     * @param  string  $rule
-     * @param  array   $parameters
-     * @return string
+     * @param string $message
+     * @param string $attribute
+     * @param string $rule
+     * @param array  $parameters
+     *
+     * @return array
      */
     protected function replaceBetween($message, $attribute, $rule, $parameters)
     {
-        return str_replace(['{min}', '{max}'], $parameters, $message);
+        return [
+            'min' => $parameters[0],
+            'max' => $parameters[1],
+        ];
     }
 
     /**
      * Replace all place-holders for the date_format rule.
      *
-     * @param  string  $message
-     * @param  string  $attribute
-     * @param  string  $rule
-     * @param  array   $parameters
-     * @return string
+     * @param string $message
+     * @param string $attribute
+     * @param string $rule
+     * @param array  $parameters
+     *
+     * @return array
      */
     protected function replaceDateFormat($message, $attribute, $rule, $parameters)
     {
-        return str_replace('{format}', $parameters[0], $message);
+        return [
+            'format' => $parameters[0],
+        ];
     }
 
     /**
      * Replace all place-holders for the different rule.
      *
-     * @param  string  $message
-     * @param  string  $attribute
-     * @param  string  $rule
-     * @param  array   $parameters
-     * @return string
+     * @param string $message
+     * @param string $attribute
+     * @param string $rule
+     * @param array  $parameters
+     *
+     * @return array
      */
     protected function replaceDifferent($message, $attribute, $rule, $parameters)
     {
@@ -76,25 +119,29 @@ class Validator extends LaravelValidator
     /**
      * Replace all place-holders for the digits rule.
      *
-     * @param  string  $message
-     * @param  string  $attribute
-     * @param  string  $rule
-     * @param  array   $parameters
-     * @return string
+     * @param string $message
+     * @param string $attribute
+     * @param string $rule
+     * @param array  $parameters
+     *
+     * @return array
      */
     protected function replaceDigits($message, $attribute, $rule, $parameters)
     {
-        return str_replace('{digits}', $parameters[0], $message);
+        return [
+            'digits' => $parameters[0],
+        ];
     }
 
     /**
      * Replace all place-holders for the digits (between) rule.
      *
-     * @param  string  $message
-     * @param  string  $attribute
-     * @param  string  $rule
-     * @param  array   $parameters
-     * @return string
+     * @param string $message
+     * @param string $attribute
+     * @param string $rule
+     * @param array  $parameters
+     *
+     * @return array
      */
     protected function replaceDigitsBetween($message, $attribute, $rule, $parameters)
     {
@@ -104,39 +151,46 @@ class Validator extends LaravelValidator
     /**
      * Replace all place-holders for the min rule.
      *
-     * @param  string  $message
-     * @param  string  $attribute
-     * @param  string  $rule
-     * @param  array   $parameters
-     * @return string
+     * @param string $message
+     * @param string $attribute
+     * @param string $rule
+     * @param array  $parameters
+     *
+     * @return array
      */
     protected function replaceMin($message, $attribute, $rule, $parameters)
     {
-        return str_replace('{min}', $parameters[0], $message);
+        return [
+            'min' => $parameters[0],
+        ];
     }
 
     /**
      * Replace all place-holders for the max rule.
      *
-     * @param  string  $message
-     * @param  string  $attribute
-     * @param  string  $rule
-     * @param  array   $parameters
-     * @return string
+     * @param string $message
+     * @param string $attribute
+     * @param string $rule
+     * @param array  $parameters
+     *
+     * @return array
      */
     protected function replaceMax($message, $attribute, $rule, $parameters)
     {
-        return str_replace('{max}', $parameters[0], $message);
+        return [
+            'max' => $parameters[0],
+        ];
     }
 
     /**
      * Replace all place-holders for the in rule.
      *
-     * @param  string  $message
-     * @param  string  $attribute
-     * @param  string  $rule
-     * @param  array   $parameters
-     * @return string
+     * @param string $message
+     * @param string $attribute
+     * @param string $rule
+     * @param array  $parameters
+     *
+     * @return array
      */
     protected function replaceIn($message, $attribute, $rule, $parameters)
     {
@@ -144,17 +198,20 @@ class Validator extends LaravelValidator
             $parameter = $this->getDisplayableValue($attribute, $parameter);
         }
 
-        return str_replace('{values}', implode(', ', $parameters), $message);
+        return [
+            'values' => implode(', ', $parameters),
+        ];
     }
 
     /**
      * Replace all place-holders for the not_in rule.
      *
-     * @param  string  $message
-     * @param  string  $attribute
-     * @param  string  $rule
-     * @param  array   $parameters
-     * @return string
+     * @param string $message
+     * @param string $attribute
+     * @param string $rule
+     * @param array  $parameters
+     *
+     * @return array
      */
     protected function replaceNotIn($message, $attribute, $rule, $parameters)
     {
@@ -164,67 +221,74 @@ class Validator extends LaravelValidator
     /**
      * Replace all place-holders for the in_array rule.
      *
-     * @param  string  $message
-     * @param  string  $attribute
-     * @param  string  $rule
-     * @param  array   $parameters
-     * @return string
+     * @param string $message
+     * @param string $attribute
+     * @param string $rule
+     * @param array  $parameters
+     *
+     * @return array
      */
     protected function replaceInArray($message, $attribute, $rule, $parameters)
     {
-        return str_replace('{other}', $this->getDisplayableAttribute($parameters[0]), $message);
+        return ['other' => $this->getDisplayableAttribute($parameters[0])];
     }
 
     /**
      * Replace all place-holders for the mimetypes rule.
      *
-     * @param  string  $message
-     * @param  string  $attribute
-     * @param  string  $rule
-     * @param  array   $parameters
-     * @return string
+     * @param string $message
+     * @param string $attribute
+     * @param string $rule
+     * @param array  $parameters
+     *
+     * @return array
      */
     protected function replaceMimetypes($message, $attribute, $rule, $parameters)
     {
-        return str_replace('{values}', implode(', ', $parameters), $message);
+        return $this->replaceIn($message, $attribute, $rule, $parameters);
     }
 
     /**
      * Replace all place-holders for the mimes rule.
      *
-     * @param  string  $message
-     * @param  string  $attribute
-     * @param  string  $rule
-     * @param  array   $parameters
-     * @return string
+     * @param string $message
+     * @param string $attribute
+     * @param string $rule
+     * @param array  $parameters
+     *
+     * @return array
      */
     protected function replaceMimes($message, $attribute, $rule, $parameters)
     {
-        return str_replace('{values}', implode(', ', $parameters), $message);
+        return $this->replaceIn($message, $attribute, $rule, $parameters);
     }
 
     /**
      * Replace all place-holders for the required_with rule.
      *
-     * @param  string  $message
-     * @param  string  $attribute
-     * @param  string  $rule
-     * @param  array   $parameters
-     * @return string
+     * @param string $message
+     * @param string $attribute
+     * @param string $rule
+     * @param array  $parameters
+     *
+     * @return array
      */
     protected function replaceRequiredWith($message, $attribute, $rule, $parameters)
     {
-        return str_replace('{values}', implode(' / ', $this->getAttributeList($parameters)), $message);
+        return [
+            'values' => implode(' / ', $this->getAttributeList($parameters)),
+        ];
     }
 
     /**
      * Replace all place-holders for the required_with_all rule.
      *
-     * @param  string  $message
-     * @param  string  $attribute
-     * @param  string  $rule
-     * @param  array   $parameters
-     * @return string
+     * @param string $message
+     * @param string $attribute
+     * @param string $rule
+     * @param array  $parameters
+     *
+     * @return array
      */
     protected function replaceRequiredWithAll($message, $attribute, $rule, $parameters)
     {
@@ -234,11 +298,12 @@ class Validator extends LaravelValidator
     /**
      * Replace all place-holders for the required_without rule.
      *
-     * @param  string  $message
-     * @param  string  $attribute
-     * @param  string  $rule
-     * @param  array   $parameters
-     * @return string
+     * @param string $message
+     * @param string $attribute
+     * @param string $rule
+     * @param array  $parameters
+     *
+     * @return array
      */
     protected function replaceRequiredWithout($message, $attribute, $rule, $parameters)
     {
@@ -248,11 +313,12 @@ class Validator extends LaravelValidator
     /**
      * Replace all place-holders for the required_without_all rule.
      *
-     * @param  string  $message
-     * @param  string  $attribute
-     * @param  string  $rule
-     * @param  array   $parameters
-     * @return string
+     * @param string $message
+     * @param string $attribute
+     * @param string $rule
+     * @param array  $parameters
+     *
+     * @return array
      */
     protected function replaceRequiredWithoutAll($message, $attribute, $rule, $parameters)
     {
@@ -262,97 +328,121 @@ class Validator extends LaravelValidator
     /**
      * Replace all place-holders for the size rule.
      *
-     * @param  string  $message
-     * @param  string  $attribute
-     * @param  string  $rule
-     * @param  array   $parameters
-     * @return string
+     * @param string $message
+     * @param string $attribute
+     * @param string $rule
+     * @param array  $parameters
+     *
+     * @return array
      */
     protected function replaceSize($message, $attribute, $rule, $parameters)
     {
-        return str_replace('{size}', $parameters[0], $message);
+        return [
+            'size' => $parameters[0],
+        ];
     }
 
     /**
      * Replace all place-holders for the gt rule.
      *
-     * @param  string  $message
-     * @param  string  $attribute
-     * @param  string  $rule
-     * @param  array   $parameters
-     * @return string
+     * @param string $message
+     * @param string $attribute
+     * @param string $rule
+     * @param array  $parameters
+     *
+     * @return array
      */
     protected function replaceGt($message, $attribute, $rule, $parameters)
     {
-        if (is_null($value = $this->getValue($parameters[0]))) {
-            return str_replace('{value}', $parameters[0], $message);
+        if (($value = $this->getValue($parameters[0])) === null) {
+            return [
+                'value' => $parameters[0],
+            ];
         }
 
-        return str_replace('{value}', $this->getSize($attribute, $value), $message);
+        return [
+            'value' => $this->getSize($attribute, $value),
+        ];
     }
 
     /**
      * Replace all place-holders for the lt rule.
      *
-     * @param  string  $message
-     * @param  string  $attribute
-     * @param  string  $rule
-     * @param  array   $parameters
-     * @return string
+     * @param string $message
+     * @param string $attribute
+     * @param string $rule
+     * @param array  $parameters
+     *
+     * @return array
      */
     protected function replaceLt($message, $attribute, $rule, $parameters)
     {
-        if (is_null($value = $this->getValue($parameters[0]))) {
-            return str_replace('{value}', $parameters[0], $message);
+        if (($value = $this->getValue($parameters[0])) === null) {
+            return [
+                'value' => $parameters[0],
+            ];
         }
 
-        return str_replace('{value}', $this->getSize($attribute, $value), $message);
+        return [
+            'value' => $this->getSize($attribute, $value),
+        ];
     }
 
     /**
      * Replace all place-holders for the gte rule.
      *
-     * @param  string  $message
-     * @param  string  $attribute
-     * @param  string  $rule
-     * @param  array   $parameters
-     * @return string
+     * @param string $message
+     * @param string $attribute
+     * @param string $rule
+     * @param array  $parameters
+     *
+     * @return array
      */
     protected function replaceGte($message, $attribute, $rule, $parameters)
     {
-        if (is_null($value = $this->getValue($parameters[0]))) {
-            return str_replace('{value}', $parameters[0], $message);
+        if (($value = $this->getValue($parameters[0])) === null) {
+            return [
+                'value' => $parameters[0],
+            ];
         }
 
-        return str_replace('{value}', $this->getSize($attribute, $value), $message);
+        return [
+            'value' => $this->getSize($attribute, $value),
+        ];
     }
 
     /**
      * Replace all place-holders for the lte rule.
      *
-     * @param  string  $message
-     * @param  string  $attribute
-     * @param  string  $rule
-     * @param  array   $parameters
-     * @return string
+     * @param string $message
+     * @param string $attribute
+     * @param string $rule
+     * @param array  $parameters
+     *
+     * @return array
      */
     protected function replaceLte($message, $attribute, $rule, $parameters)
     {
-        if (is_null($value = $this->getValue($parameters[0]))) {
-            return str_replace('{value}', $parameters[0], $message);
+        if (($value = $this->getValue($parameters[0])) === null) {
+            return [
+                'value' => $parameters[0],
+            ];
         }
 
-        return str_replace('{value}', $this->getSize($attribute, $value), $message);
+        return [
+            'value' => $this->getSize($attribute, $value),
+        ];
     }
 
     /**
      * Replace all place-holders for the required_if rule.
      *
-     * @param  string  $message
-     * @param  string  $attribute
-     * @param  string  $rule
-     * @param  array   $parameters
-     * @return string
+     * @param string $message
+     * @param string $attribute
+     * @param string $rule
+     * @param array  $parameters
+     *
+     * @return array
      */
     protected function replaceRequiredIf($message, $attribute, $rule, $parameters)
     {
@@ -360,17 +450,21 @@ class Validator extends LaravelValidator
 
         $parameters[0] = $this->getDisplayableAttribute($parameters[0]);
 
-        return str_replace(['{other}', '{value}'], $parameters, $message);
+        return [
+            'other' => $parameters[0],
+            'value' => $parameters[1],
+        ];
     }
 
     /**
      * Replace all place-holders for the required_unless rule.
      *
-     * @param  string  $message
-     * @param  string  $attribute
-     * @param  string  $rule
-     * @param  array   $parameters
-     * @return string
+     * @param string $message
+     * @param string $attribute
+     * @param string $rule
+     * @param array  $parameters
+     *
+     * @return array
      */
     protected function replaceRequiredUnless($message, $attribute, $rule, $parameters)
     {
@@ -378,53 +472,61 @@ class Validator extends LaravelValidator
 
         $values = [];
 
-        foreach (array_slice($parameters, 1) as $value) {
+        foreach (\array_slice($parameters, 1) as $value) {
             $values[] = $this->getDisplayableValue($parameters[0], $value);
         }
 
-        return str_replace(['{other}', '{values}'], [$other, implode(', ', $values)], $message);
+        return [
+            'other' => $other,
+            'values' => implode(', ', $values),
+        ];
     }
 
     /**
      * Replace all place-holders for the same rule.
      *
-     * @param  string  $message
-     * @param  string  $attribute
-     * @param  string  $rule
-     * @param  array   $parameters
-     * @return string
+     * @param string $message
+     * @param string $attribute
+     * @param string $rule
+     * @param array  $parameters
+     *
+     * @return array
      */
     protected function replaceSame($message, $attribute, $rule, $parameters)
     {
-        return str_replace('{other}', $this->getDisplayableAttribute($parameters[0]), $message);
+        return [
+            'other' => $this->getDisplayableAttribute($parameters[0]),
+        ];
     }
 
     /**
      * Replace all place-holders for the before rule.
      *
-     * @param  string  $message
-     * @param  string  $attribute
-     * @param  string  $rule
-     * @param  array   $parameters
-     * @return string
+     * @param string $message
+     * @param string $attribute
+     * @param string $rule
+     * @param array  $parameters
+     *
+     * @return array
      */
     protected function replaceBefore($message, $attribute, $rule, $parameters)
     {
-        if (! strtotime($parameters[0])) {
-            return str_replace('{date}', $this->getDisplayableAttribute($parameters[0]), $message);
+        if (!strtotime($parameters[0])) {
+            return ['date' => $this->getDisplayableAttribute($parameters[0])];
         }
 
-        return str_replace('{date}', $this->getDisplayableValue($attribute, $parameters[0]), $message);
+        return ['date' => $this->getDisplayableValue($attribute, $parameters[0])];
     }
 
     /**
      * Replace all place-holders for the before_or_equal rule.
      *
-     * @param  string  $message
-     * @param  string  $attribute
-     * @param  string  $rule
-     * @param  array   $parameters
-     * @return string
+     * @param string $message
+     * @param string $attribute
+     * @param string $rule
+     * @param array  $parameters
+     *
+     * @return array
      */
     protected function replaceBeforeOrEqual($message, $attribute, $rule, $parameters)
     {
@@ -434,11 +536,12 @@ class Validator extends LaravelValidator
     /**
      * Replace all place-holders for the after rule.
      *
-     * @param  string  $message
-     * @param  string  $attribute
-     * @param  string  $rule
-     * @param  array   $parameters
-     * @return string
+     * @param string $message
+     * @param string $attribute
+     * @param string $rule
+     * @param array  $parameters
+     *
+     * @return array
      */
     protected function replaceAfter($message, $attribute, $rule, $parameters)
     {
@@ -448,11 +551,12 @@ class Validator extends LaravelValidator
     /**
      * Replace all place-holders for the after_or_equal rule.
      *
-     * @param  string  $message
-     * @param  string  $attribute
-     * @param  string  $rule
-     * @param  array   $parameters
-     * @return string
+     * @param string $message
+     * @param string $attribute
+     * @param string $rule
+     * @param array  $parameters
+     *
+     * @return array
      */
     protected function replaceAfterOrEqual($message, $attribute, $rule, $parameters)
     {
@@ -462,11 +566,12 @@ class Validator extends LaravelValidator
     /**
      * Replace all place-holders for the date_equals rule.
      *
-     * @param  string  $message
-     * @param  string  $attribute
-     * @param  string  $rule
-     * @param  array   $parameters
-     * @return string
+     * @param string $message
+     * @param string $attribute
+     * @param string $rule
+     * @param array  $parameters
+     *
+     * @return array
      */
     protected function replaceDateEquals($message, $attribute, $rule, $parameters)
     {
@@ -476,19 +581,20 @@ class Validator extends LaravelValidator
     /**
      * Replace all place-holders for the dimensions rule.
      *
-     * @param  string  $message
-     * @param  string  $attribute
-     * @param  string  $rule
-     * @param  array   $parameters
+     * @param string $message
+     * @param string $attribute
+     * @param string $rule
+     * @param array  $parameters
+     *
      * @return string
      */
     protected function replaceDimensions($message, $attribute, $rule, $parameters)
     {
         $parameters = $this->parseNamedParameters($parameters);
 
-        if (is_array($parameters)) {
+        if (\is_array($parameters)) {
             foreach ($parameters as $key => $value) {
-                $message = str_replace('{}'.$key, $value, $message);
+                $message = str_replace('{}' . $key, $value, $message);
             }
         }
 
@@ -498,11 +604,12 @@ class Validator extends LaravelValidator
     /**
      * Replace all place-holders for the starts_with rule.
      *
-     * @param  string  $message
-     * @param  string  $attribute
-     * @param  string  $rule
-     * @param  array   $parameters
-     * @return string
+     * @param string $message
+     * @param string $attribute
+     * @param string $rule
+     * @param array  $parameters
+     *
+     * @return array
      */
     protected function replaceStartsWith($message, $attribute, $rule, $parameters)
     {
@@ -510,6 +617,6 @@ class Validator extends LaravelValidator
             $parameter = $this->getDisplayableValue($attribute, $parameter);
         }
 
-        return str_replace('{values}', implode(', ', $parameters), $message);
+        return ['values' => implode(', ', $parameters)];
     }
 }

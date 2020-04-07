@@ -1,4 +1,4 @@
-# Laravel5 Intl Translator
+# Laravel Intl Translator
 
 [![Build Status](https://travis-ci.org/Skysplit/laravel5-intl-translation.svg?branch=master)](https://travis-ci.org/Skysplit/laravel5-intl-translation)
 [![Latest Stable Version](https://poser.pugx.org/skysplit/laravel5-intl-translation/v/stable)](https://packagist.org/packages/skysplit/laravel5-intl-translation)
@@ -17,7 +17,7 @@
 - [Formatting in details](#formatting-in-details)
 
 # Introduction
-**Laravel5 Intl Translator** uses php-intl extension to provide translation for your application.
+**Laravel Intl Translator** uses php-intl extension to provide translation for your application.
 
 Please mind that this package **breaks framework default behaviour for validators**.
 
@@ -31,7 +31,7 @@ app('translator')->formatMessage($locale, $message, $params)
 ```
 
 # Requirements
-- Laravel **5.2** or **5.3**
+- Laravel **6**
 - php-intl extension installed
 
 Please feel free to contribute to this package for other Laravel versions support!
@@ -44,21 +44,6 @@ $ sudo apt-get install php-intl
 ```
 
 If you have other OS, you can use it's respective package manager
-
-
----
-
-### Laravel 5.3
-
-```bash
-composer require skysplit/laravel5-intl-translation=^2.0
-```
-
-### Laravel 5.2
-```bash
-composer require skysplit/laravel5-intl-translation=^1.0
-```
-
 
 ## All versions
 

@@ -1,10 +1,9 @@
 <?php
 
+declare(strict_types=1);
 
 namespace Skysplit\Laravel\Translation;
 
-
-use App\App;
 use Illuminate\Validation\Factory;
 
 class ValidationFactory extends Factory

@@ -1,6 +1,8 @@
 <?php
+
+declare(strict_types=1);
+
 return [
-    
     /*
     |--------------------------------------------------------------------------
     | Password Reminder Language Lines
@@ -11,10 +13,10 @@ return [
     | has failed, such as for an invalid token or invalid new password.
     |
     */
-    
+
     'password' => 'Hasło musi mieć przynajmniej sześć znaków i zgadzać się z potwierdzeniem.',
-    'reset'    => 'Hasło zostało zresetowane!',
-    'sent'     => 'Przypomnienie hasła zostało wysłane!',
-    'token'    => 'Token resetowania hasła jest nieprawidłowy.',
-    'user'     => 'Nie znaleziono użytkownika z takim adresem e-mail.',
+    'reset' => 'Hasło zostało zresetowane!',
+    'sent' => 'Przypomnienie hasła zostało wysłane!',
+    'token' => 'Token resetowania hasła jest nieprawidłowy.',
+    'user' => 'Nie znaleziono użytkownika z takim adresem e-mail.',
 ];

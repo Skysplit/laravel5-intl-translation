@@ -1,6 +1,7 @@
 <?php
 
-return [
-    'region' => null
-];
+declare(strict_types=1);
 
+return [
+    'region' => null,
+];

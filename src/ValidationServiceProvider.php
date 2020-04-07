@@ -1,12 +1,13 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Skysplit\Laravel\Translation;
 
 use Illuminate\Validation\ValidationServiceProvider as LaravelProvider;
 
 class ValidationServiceProvider extends LaravelProvider
 {
-
     public function boot()
     {
         app('validator')->resolver(function ($translator, $data, $rules, $messages, $customAttributes) {
@@ -16,8 +17,6 @@ class ValidationServiceProvider extends LaravelProvider
 
     /**
      * Register the validation factory.
-     *
-     * @return void
      */
     protected function registerValidationFactory()
     {
@@ -34,5 +33,4 @@ class ValidationServiceProvider extends LaravelProvider
             return $validator;
         });
     }
-
 }
