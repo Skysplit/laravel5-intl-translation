@@ -34,6 +34,11 @@
     },
     "require-dev": {
         "orchestra/testbench": "^3.3",
-        "phpunit/phpunit": "^8.0"
+        "phpunit/phpunit": "^8.0",
+        "friendsofphp/php-cs-fixer": "^2.16"
+    },
+    "scripts": {
+        "lint-fix": "php vendor/bin/php-cs-fixer fix --config=.php_cs",
+        "lint": "php vendor/bin/php-cs-fixer fix --config=.php_cs --dry-run"
     }
 }
