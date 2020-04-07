@@ -3,11 +3,6 @@ language: php
 php:
     - '7.2'
     - '7.4'
-    - hhvm
-
-matrix:
-    allow_failures:
-        - php: hhvm
 
 cache:
     directories:
