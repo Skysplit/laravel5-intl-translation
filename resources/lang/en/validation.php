@@ -81,8 +81,10 @@ return [
     'string' => 'The {attribute} must be a string.',
     'starts_with' => 'The {attribute} must start with one of the following: {values}',
     'timezone' => 'The {attribute} must be a valid zone.',
+    'uploaded' => 'The {attribute} failed to upload.',
     'unique' => 'The {attribute} has already been taken.',
     'url' => 'The {attribute} format is invalid.',
+    'uuid' => 'The :attribute must be a valid UUID.',
 
     /*
     |--------------------------------------------------------------------------

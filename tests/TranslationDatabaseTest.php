@@ -17,7 +17,7 @@ class TranslationDatabaseTest extends TestCase
 
         $this->loadMigrationsFrom([
             '--database' => 'testing',
-            '--realpath' => realpath(__DIR__ . '/database/migrations'),
+            '--path' => realpath(__DIR__ . '/database/migrations'),
         ]);
     }
 
@@ -31,16 +31,6 @@ class TranslationDatabaseTest extends TestCase
             'database' => ':memory:',
             'prefix' => '',
         ]);
-    }
-
-    /**
-     * Create test user.
-     *
-     * @return User
-     */
-    public function makeUser()
-    {
-        return User::create(['name' => 'test']);
     }
 
     public function testDatabaseValidators()
@@ -65,5 +55,15 @@ class TranslationDatabaseTest extends TestCase
 
         $this->assertEquals('The selected exists is invalid.', $errors->first('exists'));
         $this->assertEquals('The unique has already been taken.', $errors->first('unique'));
+    }
+
+    /**
+     * Create test user.
+     *
+     * @return User
+     */
+    private function makeUser()
+    {
+        return User::create(['name' => 'test']);
     }
 }
