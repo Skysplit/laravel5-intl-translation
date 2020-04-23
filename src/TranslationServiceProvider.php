@@ -37,7 +37,7 @@ class TranslationServiceProvider extends LaravelProvider
     /**
      * Bootstrap the application events.
      */
-    public function boot()
+    public function boot(): void
     {
         $this->publishConfig();
         $this->publishLangFiles();
@@ -46,7 +46,7 @@ class TranslationServiceProvider extends LaravelProvider
     /**
      * * Publish config files using php artisan vendor:publish.
      */
-    protected function publishConfig()
+    protected function publishConfig(): void
     {
         $configFile = 'translator.php';
 
@@ -60,7 +60,7 @@ class TranslationServiceProvider extends LaravelProvider
     /**
      * Publish lang files using php artisan vendor:publish.
      */
-    protected function publishLangFiles()
+    protected function publishLangFiles(): void
     {
         $langPath = $this->getLangPath();
 
@@ -86,20 +86,16 @@ class TranslationServiceProvider extends LaravelProvider
 
     /**
      * Get config files directory.
-     *
-     * @return string
      */
-    protected function getConfigPath()
+    protected function getConfigPath(): string
     {
         return __DIR__ . \DIRECTORY_SEPARATOR . '..' . \DIRECTORY_SEPARATOR . 'config' . \DIRECTORY_SEPARATOR;
     }
 
     /**
      * Get language files directory.
-     *
-     * @return string
      */
-    protected function getLangPath()
+    protected function getLangPath(): string
     {
         return __DIR__ . \DIRECTORY_SEPARATOR . '..' . \DIRECTORY_SEPARATOR . 'resources' . \DIRECTORY_SEPARATOR . 'lang' . \DIRECTORY_SEPARATOR;
     }

@@ -14,27 +14,27 @@ use Illuminate\Support\Str;
  */
 class TranslationTest extends TestCase
 {
-    public function testAttributesPlaceholder()
+    public function testAttributesPlaceholder(): void
     {
         $this->assertEquals('Hello, Jane!', trans('test::test.hello', ['name' => 'Jane']));
         $this->assertEquals('Hello, Jon!', trans('test::test.hello', ['name' => 'Jon']));
     }
 
-    public function testPlurals()
+    public function testPlurals(): void
     {
         $this->assertEquals('no apples', trans_choice('test::test.apples', 0));
         $this->assertEquals('1 apple', trans_choice('test::test.apples', 1));
         $this->assertEquals('2 apples', trans_choice('test::test.apples', 2));
     }
 
-    public function testPluralsChoiceArray()
+    public function testPluralsChoiceArray(): void
     {
         $this->assertEquals('no apples', trans_choice('test::test.apples', []));
         $this->assertEquals('1 apple', trans_choice('test::test.apples', [1]));
         $this->assertEquals('2 apples', trans_choice('test::test.apples', [1, 2]));
     }
 
-    public function testPluralsChoiceCountable()
+    public function testPluralsChoiceCountable(): void
     {
         $this->assertEquals('no apples', trans_choice('test::test.apples', collect()));
         $this->assertEquals('1 apple', trans_choice('test::test.apples', collect([1])));
@@ -49,14 +49,14 @@ class TranslationTest extends TestCase
         $this->assertEquals('You and 2 others liked this', trans_choice('test::test.offset', 3));
     }
 
-    public function testSelect()
+    public function testSelect(): void
     {
         $this->assertEquals('He has two legs and is male!', trans('test::test.select', ['gender' => 'male']));
         $this->assertEquals('She has two legs and is female!', trans('test::test.select', ['gender' => 'female']));
         $this->assertEquals('It has two legs and is penguin!', trans('test::test.select', ['gender' => 'penguin']));
     }
 
-    public function testValidatorMessages()
+    public function testValidatorMessages(): void
     {
         $imgDir = $this->fixturesPath . '/images';
 

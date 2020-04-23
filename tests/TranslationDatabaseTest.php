@@ -33,7 +33,7 @@ class TranslationDatabaseTest extends TestCase
         ]);
     }
 
-    public function testDatabaseValidators()
+    public function testDatabaseValidators(): void
     {
         $this->makeUser();
 
