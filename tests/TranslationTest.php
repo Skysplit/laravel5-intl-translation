@@ -14,27 +14,27 @@ use Illuminate\Support\Str;
  */
 class TranslationTest extends TestCase
 {
-    public function testAttributesPlaceholder()
+    public function testAttributesPlaceholder(): void
     {
         $this->assertEquals('Hello, Jane!', trans('test::test.hello', ['name' => 'Jane']));
         $this->assertEquals('Hello, Jon!', trans('test::test.hello', ['name' => 'Jon']));
     }
 
-    public function testPlurals()
+    public function testPlurals(): void
     {
         $this->assertEquals('no apples', trans_choice('test::test.apples', 0));
         $this->assertEquals('1 apple', trans_choice('test::test.apples', 1));
         $this->assertEquals('2 apples', trans_choice('test::test.apples', 2));
     }
 
-    public function testPluralsChoiceArray()
+    public function testPluralsChoiceArray(): void
     {
         $this->assertEquals('no apples', trans_choice('test::test.apples', []));
         $this->assertEquals('1 apple', trans_choice('test::test.apples', [1]));
         $this->assertEquals('2 apples', trans_choice('test::test.apples', [1, 2]));
     }
 
-    public function testPluralsChoiceCountable()
+    public function testPluralsChoiceCountable(): void
     {
         $this->assertEquals('no apples', trans_choice('test::test.apples', collect()));
         $this->assertEquals('1 apple', trans_choice('test::test.apples', collect([1])));
@@ -49,14 +49,14 @@ class TranslationTest extends TestCase
         $this->assertEquals('You and 2 others liked this', trans_choice('test::test.offset', 3));
     }
 
-    public function testSelect()
+    public function testSelect(): void
     {
         $this->assertEquals('He has two legs and is male!', trans('test::test.select', ['gender' => 'male']));
         $this->assertEquals('She has two legs and is female!', trans('test::test.select', ['gender' => 'female']));
         $this->assertEquals('It has two legs and is penguin!', trans('test::test.select', ['gender' => 'penguin']));
     }
 
-    public function testValidatorMessages()
+    public function testValidatorMessages(): void
     {
         $imgDir = $this->fixturesPath . '/images';
 
@@ -80,7 +80,7 @@ class TranslationTest extends TestCase
             'before_date' => Carbon::now()->addDay()->toDateString(),
             'before_or_equal_date' => Carbon::now()->addDay()->toDateString(),
             'between_numeric' => 10,
-            'between_file' => new UploadedFile($fixturesPath . '/texts/test_between.txt', Str::random(), null, null, null, true),
+            'between_file' => new UploadedFile($fixturesPath . '/texts/test_between.txt', Str::random(), null, null, true),
             'between_string' => Str::random(10),
             'between_array' => range(1, 10),
             'boolean' => 'string',
@@ -98,22 +98,22 @@ class TranslationTest extends TestCase
             ],
             'email' => 'notanemail',
             'filled' => '',
-            'image' => new UploadedFile($fixturesPath . '/texts/test_between.txt', Str::random(), null, null, null, true),
+            'image' => new UploadedFile($fixturesPath . '/texts/test_between.txt', Str::random(), null, null, true),
             'in' => 'c',
             'in_array' => 4,
             'integer' => 4.20,
             'ip' => 'a.a.a.a',
             'json' => '{a:c}',
             'max_numeric' => 1234567,
-            'max_file_plural' => new UploadedFile($fixturesPath . '/texts/test_between.txt', Str::random(), null, 0, null, true),
+            'max_file_plural' => new UploadedFile($fixturesPath . '/texts/test_between.txt', Str::random(), null, 0, true),
             'max_string_plural' => 'abcdefghijklmn',
             'max_array_plural' => [1, 2, 3, 4, 5, 6],
-            'max_file_singular' => new UploadedFile($fixturesPath . '/texts/test_between.txt', Str::random(), null, 5, null, true),
+            'max_file_singular' => new UploadedFile($fixturesPath . '/texts/test_between.txt', Str::random(), null, 0, true),
             'max_string_singular' => 'string|max:1',
             'max_array_singular' => [1, 2],
-            'mimes' => new UploadedFile($this->fixturesPath . '/images/image.jpg', Str::random(), null, null, null, true),
+            'mimes' => new UploadedFile($this->fixturesPath . '/images/image.jpg', Str::random(), null, null, true),
             'min_numeric' => 1,
-            'min_file' => new UploadedFile($fixturesPath . '/texts/test_empty.txt', Str::random(), null, null, null, true),
+            'min_file' => new UploadedFile($fixturesPath . '/texts/test_empty.txt', Str::random(), null, null, true),
             'min_string' => 'a',
             'min_array' => [1],
             'numeric' => 'qwe',
@@ -126,10 +126,10 @@ class TranslationTest extends TestCase
             'required_without_all' => '',
             'same' => 'notthesame',
             'size_numeric' => 12,
-            'size_file_plural' => new UploadedFile($fixturesPath . '/texts/test_empty.txt', Str::random(), null, null, null, true),
+            'size_file_plural' => new UploadedFile($fixturesPath . '/texts/test_empty.txt', Str::random(), null, null, true),
             'size_string_plural' => 'ab',
             'size_array_plural' => ['a', 'b'],
-            'size_file_singular' => new UploadedFile($fixturesPath . '/texts/test_empty.txt', Str::random(), null, null, null, true),
+            'size_file_singular' => new UploadedFile($fixturesPath . '/texts/test_empty.txt', Str::random(), null, null, true),
             'size_string_singular' => 'ab',
             'size_array_singular' => ['a', 'b'],
             'starts_with' => 'abcdef',

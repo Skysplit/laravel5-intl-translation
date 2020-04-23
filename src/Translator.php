@@ -17,45 +17,33 @@ class Translator extends NamespacedItemResolver implements TranslatorContract
 
     /**
      * The loader implementation.
-     *
-     * @varLoader
      */
-    protected $loader;
+    protected Loader $loader;
 
     /**
      * The default locale being used by the translator.
-     *
-     * @var string
      */
-    protected $locale;
+    protected ?string $locale = null;
 
     /**
      * The fallback locale used by the translator.
-     *
-     * @var string
      */
-    protected $fallback;
+    protected ?string $fallback = null;
 
     /**
      * Locale region used by translator.
-     *
-     * @var string
      */
-    protected $region;
+    protected ?string $region = null;
 
     /**
      * The array of loaded translation groups.
-     *
-     * @var array
      */
-    protected $loaded = [];
+    protected array $loaded = [];
 
     /**
      * Create a new translator instance.
-     *
-     * @param string $locale
      */
-    public function __construct(Loader $loader, $locale)
+    public function __construct(Loader $loader, string $locale)
     {
         $this->loader = $loader;
         $this->setLocale($locale);
@@ -63,14 +51,8 @@ class Translator extends NamespacedItemResolver implements TranslatorContract
 
     /**
      * Determine if a translation exists.
-     *
-     * @param string      $key
-     * @param null|string $locale
-     * @param bool        $fallback
-     *
-     * @return bool
      */
-    public function has($key, $locale = null)
+    public function has(string $key, ?string $locale = null): bool
     {
         return $this->getMessage($key, $locale) !== $key;
     }
@@ -180,50 +162,39 @@ class Translator extends NamespacedItemResolver implements TranslatorContract
      *
      * @param string $fallback
      */
-    public function setFallback($fallback)
+    public function setFallback(?string $fallback)
     {
         $this->fallback = $fallback;
     }
 
     /**
      * Get the fallback locale being used.
-     *
-     * @return string
      */
-    public function getFallback()
+    public function getFallback(): ?string
     {
         return $this->fallback;
     }
 
     /**
      * Set locale region.
-     *
-     * @param string $region
      */
-    public function setRegion($region)
+    public function setRegion(?string $region)
     {
         $this->region = $region;
     }
 
     /**
      * Get locale region.
-     *
-     * @return null|string
      */
-    public function getRegion()
+    public function getRegion(): ?string
     {
         return $this->region;
     }
 
     /**
-     * Get locale with region separated by hypen.
-     *
-     * @param null|string $locale
-     * @param null|string $region
-     *
-     * @return string
+     * Get locale with region separated by hyphen.
      */
-    public function getLocaleRegion($locale = null, $region = null)
+    public function getLocaleRegion(?string $locale = null, ?string $region = null): string
     {
         $locale = $locale ?: ($this->getLocale() ?: $this->getFallback());
         $region = $region ?: $this->getRegion();
@@ -255,12 +226,8 @@ class Translator extends NamespacedItemResolver implements TranslatorContract
 
     /**
      * Load the specified language group.
-     *
-     * @param string $namespace
-     * @param string $group
-     * @param string $locale
      */
-    public function load($namespace, $group, $locale)
+    public function load(string $namespace, string $group, string $locale)
     {
         if ($this->isLoaded($namespace, $group, $locale)) {
             return;
@@ -276,11 +243,8 @@ class Translator extends NamespacedItemResolver implements TranslatorContract
 
     /**
      * Add a new namespace to the loader.
-     *
-     * @param string $namespace
-     * @param string $hint
      */
-    public function addNamespace($namespace, $hint)
+    public function addNamespace(string $namespace, string $hint)
     {
         $this->loader->addNamespace($namespace, $hint);
     }
@@ -288,13 +252,9 @@ class Translator extends NamespacedItemResolver implements TranslatorContract
     /**
      * Get the translation for the given key.
      *
-     * @param string      $key
-     * @param null|string $locale
-     * @param bool        $fallback
-     *
      * @return null|array|string
      */
-    public function getMessage($key, $locale = null)
+    public function getMessage(string $key, ?string $locale = null)
     {
         [$namespace, $group, $item] = $this->parseKey($key);
 
@@ -320,14 +280,9 @@ class Translator extends NamespacedItemResolver implements TranslatorContract
     /**
      * Retrieve a language line out the loaded array.
      *
-     * @param string $namespace
-     * @param string $group
-     * @param string $locale
-     * @param string $item
-     *
      * @return null|array|string
      */
-    protected function getLine($namespace, $group, $locale, $item)
+    protected function getLine(string $namespace, string $group, string $locale, string $item)
     {
         $line = Arr::get($this->loaded[$namespace][$group][$locale], $item);
 
@@ -340,26 +295,16 @@ class Translator extends NamespacedItemResolver implements TranslatorContract
 
     /**
      * Get the array of locales to be checked.
-     *
-     * @param null|string $locale
-     *
-     * @return array
      */
-    protected function parseLocale($locale)
+    protected function parseLocale(?string $locale): array
     {
         return array_filter([$locale ?: $this->locale, $this->fallback]);
     }
 
     /**
      * Determine if the given group has been loaded.
-     *
-     * @param string $namespace
-     * @param string $group
-     * @param string $locale
-     *
-     * @return bool
      */
-    protected function isLoaded($namespace, $group, $locale)
+    protected function isLoaded(string $namespace, string $group, string $locale): bool
     {
         return isset($this->loaded[$namespace][$group][$locale]);
     }

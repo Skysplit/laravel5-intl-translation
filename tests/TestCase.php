@@ -11,10 +11,7 @@ use Skysplit\Laravel\Translation\ValidationServiceProvider;
  */
 class TestCase extends Orchestra\Testbench\TestCase
 {
-    /**
-     * @var null|string
-     */
-    protected $fixturesPath;
+    protected ?string $fixturesPath;
 
     public function setUp(): void
     {

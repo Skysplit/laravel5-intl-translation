@@ -1,7 +1,6 @@
 language: php
 
 php:
-    - '7.2'
     - '7.4'
 
 cache:
@@ -14,4 +13,4 @@ before_script:
 
 script:
     - composer lint
-    - phpunit
+    - vendor/bin/phpunit

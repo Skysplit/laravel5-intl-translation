@@ -8,7 +8,7 @@ use Illuminate\Validation\ValidationServiceProvider as LaravelProvider;
 
 class ValidationServiceProvider extends LaravelProvider
 {
-    public function boot()
+    public function boot(): void
     {
         app('validator')->resolver(function ($translator, $data, $rules, $messages, $customAttributes) {
             return new Validator($translator, $data, $rules, $messages, $customAttributes);

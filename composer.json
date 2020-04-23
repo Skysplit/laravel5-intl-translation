@@ -26,15 +26,15 @@
         ]
     },
     "require": {
-        "php": ">=7.2.0",
+        "php": ">=7.4.0",
         "ext-intl": "*",
-        "illuminate/support": "^6",
-        "illuminate/translation": "^6",
-        "illuminate/validation": "^6"
+        "illuminate/support": "^7",
+        "illuminate/translation": "^7",
+        "illuminate/validation": "^7"
     },
     "require-dev": {
-        "orchestra/testbench": "^3.3",
-        "phpunit/phpunit": "^8.0",
+        "orchestra/testbench": "5.1.0",
+        "phpunit/phpunit": "^9.0",
         "friendsofphp/php-cs-fixer": "^2.16"
     },
     "scripts": {
