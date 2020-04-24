@@ -260,10 +260,14 @@ class Translator extends NamespacedItemResolver implements TranslatorContract
 
         $locales = [$locale ?: $this->locale];
 
+        $message = null;
+
         foreach ($locales as $locale) {
             $this->load($namespace, $group, $locale);
 
-            $message = $this->getLine($namespace, $group, $locale, $item);
+            if ($item !== null) {
+                $message = $this->getLine($namespace, $group, $locale, $item);
+            }
 
             if ($message !== null) {
                 break;
