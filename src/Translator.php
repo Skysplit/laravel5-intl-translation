@@ -66,7 +66,13 @@ class Translator extends NamespacedItemResolver implements TranslatorContract
             return $message;
         }
 
-        return MessageFormatter::formatMessage($this->getLocaleRegion($locale), $message, $parameters);
+        $formattedMessage = MessageFormatter::formatMessage($this->getLocaleRegion($locale), $message, $parameters);
+
+        if ($formattedMessage === false) {
+            return $message;
+        }
+
+        return $formattedMessage;
     }
 
     /**

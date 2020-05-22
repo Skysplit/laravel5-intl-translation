@@ -14,6 +14,11 @@ use Illuminate\Support\Str;
  */
 class TranslationTest extends TestCase
 {
+    public function testEmptyMessage(): void
+    {
+        $this->assertEquals('', trans('test::test.empty', ['name' => 'Jane']));
+    }
+
     public function testAttributesPlaceholder(): void
     {
         $this->assertEquals('Hello, Jane!', trans('test::test.hello', ['name' => 'Jane']));
