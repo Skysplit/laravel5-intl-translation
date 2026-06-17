@@ -28,13 +28,13 @@
     "require": {
         "php": ">=7.4.0|^8.2|^8.3",
         "ext-intl": "*",
-        "illuminate/support": "^8|^9|^10|^11",
-        "illuminate/translation": "^8|^9|^10|^11",
-        "illuminate/validation": "^8|^9|^10|^11"
+        "illuminate/support": "^8|^9|^10|^11|^12",
+        "illuminate/translation": "^8|^9|^10|^11|^12",
+        "illuminate/validation": "^8|^9|^10|^11|^12"
     },
     "require-dev": {
-        "orchestra/testbench": "9.5.2",
-        "phpunit/phpunit": "^10",
+        "orchestra/testbench": "^10.0",
+        "phpunit/phpunit": "^11.5.3 || ^12",
         "friendsofphp/php-cs-fixer": "^3.64"
     },
     "scripts": {
